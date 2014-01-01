@@ -1,9 +1,8 @@
 # minibus.js
 
-![Minibus.js](../master/img/minibus.png?raw=true)
-{:img width="100"}
-
 Minimal Message Dispatcher for JavaScript.
+
+![Minibus.js](../master/img/minibus.png?raw=true)
 
 ## Features
 
