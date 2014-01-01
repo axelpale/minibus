@@ -1,6 +1,6 @@
 # minibus.js
 
-![Minibus.js](../blob/master/img/minibus.png?raw=true)
+![Minibus.js](../master/img/minibus.png?raw=true)
 
 Minimal Message Dispatcher for JavaScript.
 
