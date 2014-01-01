@@ -1,6 +1,7 @@
 # minibus.js
 
 ![Minibus.js](../master/img/minibus.png?raw=true)
+{width="100"}
 
 Minimal Message Dispatcher for JavaScript.
 
