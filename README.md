@@ -6,6 +6,7 @@ Minimal Message Dispatcher for JavaScript.
 
 ## Features
 
+- Lightweight, less than 300 bytes when compressed.
 - Create a message bus by `var bus = Minibus.create()`
 - Bind event handlers by `bus.on('myevent', function () { ... })`
 - Emit events by `bus.emit('myevent')`
@@ -32,7 +33,21 @@ Minimal Message Dispatcher for JavaScript.
       });
     > bus.emit('wakeup', 'Hello ', 'universe.');
     Hello universe.
-    
+
+## Extend
+
+Extend Minibus instances by:
+
+    Minibus.extension.myFunction = function (...) {...};
+
+After that you can:
+
+    var bus = Minibus.create();
+    bus.myFunction();
+
+## History
+
+The development of Minibus started in 2013-02-15 after hassling with [EventBus](https://github.com/krasimir/EventBus) and [Socket.IO](http://socket.io/). They either had complex API or solved too much.
 
 ## License
 
