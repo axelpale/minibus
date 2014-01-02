@@ -1,21 +1,3 @@
-/*! minibus - v2.0.0 - 2014-01-02
- * https://github.com/axelpale/minibus
- *
- * Copyright (c) 2014 Akseli Palen <akseli.palen@gmail.com>;
- * Licensed under the MIT license */
-
-(function (window, undefined) {
-  'use strict';
-  
-  
-  
-  
-  
-  
-  
-  // ten lines to ease counting and finding the lines in test output.
-
-
 // Minibus
 //
 // Known Issues
@@ -121,20 +103,3 @@ var Minibus = (function () {
   ///////////////
   return exports;
 }());
-
-
-  // Version
-  Minibus.version = '2.0.0';
-
-
-  
-  // Modules
-  if(typeof module === 'object' && typeof module.exports === 'object') {
-    // Common JS
-    // http://wiki.commonjs.org/wiki/Modules/1.1
-    module.exports = Minibus;
-  } else {
-    // Browsers
-    window.Minibus = Minibus;
-  }
-})(this);
