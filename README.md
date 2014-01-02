@@ -12,7 +12,7 @@ Minimal Message Dispatcher for JavaScript.
 - Emit events by `bus.emit('myevent')`
 - Pass parameters to handlers by `bus.emit('myevent', param1, param2, ...)`
 - Unbind the handlers by `bus.off('myevent')`
-- Unbind specific handler by `var route = bus.on('myevent', function () { ... })` and `bus.off(route)`
+- Unbind specific handler by first `var route = bus.on('myevent', function () { ... })` and then `bus.off(route)`
 
 ## Basic example
 
