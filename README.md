@@ -36,4 +36,4 @@ Minimal Message Dispatcher for JavaScript.
 
 ## License
 
-MIT
+[MIT License](../blob/master/LICENSE)
