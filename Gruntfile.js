@@ -39,6 +39,7 @@ module.exports = function(grunt) {
         src: [
           'src/intro.js',
           'src/minibus.js',
+          'src/identity.js',
           'src/version.js',
           'src/outro.js'
         ],
