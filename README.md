@@ -36,7 +36,7 @@ Minimal Message Dispatcher for JavaScript.
 
 ## Extend
 
-Extend Minibus instances by:
+Extend buses by:
 
     Minibus.extension.myFunction = function (...) {...};
 
