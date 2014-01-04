@@ -128,8 +128,18 @@ module.exports = function(grunt) {
           }
         ]
       }
-    }
+    },
     
+    qunit: {
+      dist: {
+        options: {
+          urls: [
+            'http://localhost:8000/test/basic-usage.html',
+            'http://localhost:8000/test/invalid-arguments.html'
+          ]
+        },
+      }
+    }
   });
   
   // Load tasks
