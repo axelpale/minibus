@@ -139,6 +139,16 @@ module.exports = function(grunt) {
           ]
         },
       }
+    },
+    
+    // Start server for QUnit tests.
+    connect: {
+      server: {
+        options: {
+          port: 8000,
+          base: '.'
+        }
+      }
     }
   });
   
@@ -147,6 +157,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify'); // For minifying
   grunt.loadNpmTasks('grunt-contrib-jshint'); // For sanity testing
   grunt.loadNpmTasks('grunt-contrib-qunit'); // For functional testing
+  grunt.loadNpmTasks('grunt-contrib-connect'); // For functional test server
   grunt.loadNpmTasks('grunt-replace'); // For adding versions
   
   // Default task(s).
