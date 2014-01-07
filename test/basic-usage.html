@@ -2,17 +2,58 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>QUnit Example</title>
+  <title>Minibus.js test suite: Basic usage</title>
   <link rel="stylesheet" href="lib/qunit-1.13.0.css">
 </head>
 <body>
   <div id="qunit"></div>
   <div id="qunit-fixture"></div>
   <script src="lib/qunit-1.13.0.js"></script>
+  <script src="../minibus.js"></script>
   <script type="text/javascript">
-    test('hello test', function () {
-      ok( true, 'passed!');
+    
+    asyncTest('on & emit with object param', function () {
+      
+      var bus = Minibus.create();
+      
+      bus.on('myevent', function (param1) {
+        ok(param1.msg === 'hello', 'Parameter should be passed.');
+        ok(param1 === this, 'First parameter should be the context.');
+        start();
+      });
+      
+      bus.emit('myevent', {msg:'hello'});
     });
+    
+    asyncTest('on & emit with non-object param', function () {
+      stop(2); // Three start() calls
+      
+      var bus = Minibus.create();
+      bus.on('myevent', function (param1) {
+        deepEqual(this, {}, 'Context should not be the first parameter.');
+        start();
+      });
+      bus.emit('myevent', 'hello');
+      bus.emit('myevent', 3);
+      bus.emit('myevent', undefined);
+    });
+    
+    asyncTest('on & off & emit', function () {
+      var bus = Minibus.create();
+      bus.on('myevent', function () {
+        ok(false, 'Should not be executed.');
+      });
+      bus.on('otherevent', function () {
+        ok(true, 'Should be executed.');
+        start();
+      });
+      
+      bus.off('myevent');
+      
+      bus.emit('myevent'); // Should not work
+      bus.emit('otherevent'); // Should work
+    });
+    
   </script>
 </body>
 </html>

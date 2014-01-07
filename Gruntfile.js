@@ -163,6 +163,8 @@ module.exports = function(grunt) {
   // Default task(s).
   grunt.registerTask('default', ['build']);
   grunt.registerTask('build', ['replace', 'concat', 'uglify', 'test']);
-  grunt.registerTask('test', ['jshint']);
+  grunt.registerTask('test', ['test:syntax', 'test:function']);
+  grunt.registerTask('test:syntax', ['jshint']);
+  grunt.registerTask('test:function', ['connect', 'qunit']);
   
 };

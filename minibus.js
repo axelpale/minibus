@@ -1,4 +1,4 @@
-/*! minibus - v2.1.0 - 2014-01-02
+/*! minibus - v2.1.1 - 2014-01-07
  * https://github.com/axelpale/minibus
  *
  * Copyright (c) 2014 Akseli Palen <akseli.palen@gmail.com>;
@@ -229,7 +229,8 @@ var Minibus = (function () {
     //     Event key
     //   arg1 (optional)
     //     Argument to be passed to the handler functions.
-    //     Is also the this-context of the functions.
+    //     If type of arg1 is an object then it will be used
+    //     as this-context for the functions.
     //   arg2 (optional)
     //   ...
     // 
@@ -239,15 +240,20 @@ var Minibus = (function () {
     var emitArgs, i, routes, context;
     
     if (this.keyRoutes.hasOwnProperty(key)) {
-      // Collect passed arguments
+      // Collect passed arguments. Drop the 'key' argument.
       emitArgs = [];
       for (i = 1; i < arguments.length; i += 1) {
         emitArgs.push(arguments[i]);
       }
       
-      // First argument will also be the context
+      // First argument will also be the context (if type of object).
+      // ECMA Script requires the context to be an object.
+      //   See http://stackoverflow.com/a/15027847/638546
       if (emitArgs.length > 0) {
         context = emitArgs[0];
+        if (typeof context !== 'object') {
+          context = {};
+        }
       } else {
         context = {};
       }
@@ -307,7 +313,7 @@ var Identity = (function () {
 
 
   // Version
-  Minibus.version = '2.1.0';
+  Minibus.version = '2.1.1';
 
 
   
