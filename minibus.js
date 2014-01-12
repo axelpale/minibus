@@ -1,4 +1,4 @@
-/*! minibus - v2.1.2 - 2014-01-12
+/*! minibus - v2.2.0 - 2014-01-13
  * https://github.com/axelpale/minibus
  *
  * Copyright (c) 2014 Akseli Palen <akseli.palen@gmail.com>;
@@ -50,13 +50,20 @@ var Minibus = (function () {
   
   // Mutators
   
-  Bus.prototype.on = function (key, fun) {
+  var _on = function (key, fun) {
     // Bind handler function to a specific event.
     //
     // Parameter
+    //   key
+    //     String. The event name.
+    //   fun
+    //     Function to be executed when the event happens.
     // 
+    // Throws
+    //   InvalidParameterError
+    //   
     // Return
-    //   route
+    //   route object
     
     // Validate parameters
     var valid = false;
@@ -108,7 +115,37 @@ var Minibus = (function () {
     return route;
   };
   
-  Bus.prototype.off = function (routeOrKey, fun) {
+  // Aliases
+  
+  // See Backbone.js Events.on
+  // See Node.js events.EventEmitter.on
+  Bus.prototype.on = _on;
+  
+  // See http://stackoverflow.com/a/9672223/638546
+  Bus.prototype.listen = _on;
+  
+  // See Node.js events.EventEmitter.addListener
+  // Uncomment to enable. Too lengthy to be included by default.
+  //Bus.prototype.addListener = _on;
+  
+  // See Mozilla Web API EventTarget.addEventListener
+  // See http://stackoverflow.com/a/11237657/638546
+  // Uncomment to enable. Too lengthy to be included by default.
+  //Bus.prototype.addEventListener = _on;
+  
+  
+  
+  var _once = function (key, fun) {
+    throw 'Not implemented.';
+  };
+  
+  // See Node.js events.EventEmitter.once
+  // See Backbone.js Events.once
+  Bus.prototype.once = _once;
+  
+  
+  
+  var _off = function (routeOrKey, fun) {
     // Unbind one or many handlers.
     // 
     // Parameter
@@ -236,7 +273,19 @@ var Minibus = (function () {
     return this;
   };
   
-  Bus.prototype.emit = function (key) {
+  // Backbone.js Events.off
+  Bus.prototype.off = _off;
+  
+  // Node.js events.EventEmitter.removeListener
+  Bus.prototype.removeListener = _off;
+  
+  // See Mozilla Web API EventTarget.removeEventListener
+  // Uncomment to enable. Too lengthy to be included by default.
+  //Bus.prototype.removeEventListener = _off;
+  
+  
+  
+  var _emit = function (key) {
     // Emit an event to fire the bound handlers.
     // The handlers are executed immediately.
     // 
@@ -286,6 +335,21 @@ var Minibus = (function () {
     return this;
   };
   
+  // See Node.js events.EventEmitter.emit
+  Bus.prototype.emit = _emit;
+  
+  // See Backbone.js Events.trigger
+  Bus.prototype.trigger = _emit;
+  
+  // See Mozilla Web API EventTarget.dispatchEvent
+  // See http://stackoverflow.com/a/10085161/638546
+  // Uncomment to enable. Too lengthy to be included by default.
+  //Bus.prototype.dispatchEvent = _emit;
+  
+  // See http://stackoverflow.com/a/9672223/638546
+  // Uncomment to enable. Too rare to be included by default.
+  //Bus.prototype.fireEvent = _emit;
+  
   
   
   ///////////////
@@ -329,7 +393,7 @@ var Identity = (function () {
 
 
   // Version
-  Minibus.version = '2.1.2';
+  Minibus.version = '2.2.0';
 
 
   

@@ -69,6 +69,18 @@
       bus.emit('myevent');
     });
     
+    asyncTest('alternative function names', function testCase() {
+      expect(1);
+      var bus = Minibus.create();
+      bus.listen('myevent', function handler() {
+        ok(true, 'Should be called');
+      });
+      bus.trigger('myevent');
+      bus.removeListener('myevent');
+      bus.trigger('myevent');
+      setTimeout(start, 0); // handler may not be called immediately.
+    });
+    
   </script>
 </body>
 </html>
