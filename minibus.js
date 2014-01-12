@@ -1,4 +1,4 @@
-/*! minibus - v2.1.1 - 2014-01-07
+/*! minibus - v2.1.2 - 2014-01-12
  * https://github.com/axelpale/minibus
  *
  * Copyright (c) 2014 Akseli Palen <akseli.palen@gmail.com>;
@@ -57,6 +57,22 @@ var Minibus = (function () {
     // 
     // Return
     //   route
+    
+    // Validate parameters
+    var valid = false;
+    if (typeof key === 'string' &&
+        typeof fun === 'function') {
+      valid = true;
+    }
+    if (!valid) {
+      throw {
+        name: 'InvalidParameterError',
+        message: 'Invalid or insufficient parameters. ' +
+                 'Event must be a string and handler a function. ' +
+                 'Instead they are ' + (typeof key) + ' and ' + (typeof fun) +
+                 '.'
+      };
+    }
     
     if (this.keyRoutes.hasOwnProperty(key)) {
       // Do not add if the route already exists.
@@ -313,7 +329,7 @@ var Identity = (function () {
 
 
   // Version
-  Minibus.version = '2.1.1';
+  Minibus.version = '2.1.2';
 
 
   

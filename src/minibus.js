@@ -40,6 +40,22 @@ var Minibus = (function () {
     // Return
     //   route
     
+    // Validate parameters
+    var valid = false;
+    if (typeof key === 'string' &&
+        typeof fun === 'function') {
+      valid = true;
+    }
+    if (!valid) {
+      throw {
+        name: 'InvalidParameterError',
+        message: 'Invalid or insufficient parameters. ' +
+                 'Event must be a string and handler a function. ' +
+                 'Instead they are ' + (typeof key) + ' and ' + (typeof fun) +
+                 '.'
+      };
+    }
+    
     if (this.keyRoutes.hasOwnProperty(key)) {
       // Do not add if the route already exists.
       var routes, i, exists;

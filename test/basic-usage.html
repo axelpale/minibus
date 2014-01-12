@@ -54,6 +54,21 @@
       bus.emit('otherevent'); // Should work
     });
     
+    asyncTest('route', function () {
+      expect(1); // expect only one assertion
+      
+      var bus = Minibus.create();
+      var route = bus.on('myevent', function () {
+        ok(false, 'Should not be executed.');
+      });
+      var route2 = bus.on('myevent', function () {
+        ok(true, 'Should be executed.');
+        start();
+      });
+      bus.off(route);
+      bus.emit('myevent');
+    });
+    
   </script>
 </body>
 </html>

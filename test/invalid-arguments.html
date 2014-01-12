@@ -2,16 +2,105 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>QUnit Example</title>
+  <title>Minibus.js test suite: Invalid arguments</title>
   <link rel="stylesheet" href="lib/qunit-1.13.0.css">
 </head>
 <body>
   <div id="qunit"></div>
   <div id="qunit-fixture"></div>
   <script src="lib/qunit-1.13.0.js"></script>
+  <script src="../minibus.js"></script>
   <script type="text/javascript">
+    
     test('invalid arguments', function () {
       ok( true, 'passed!');
+    });
+    
+    test('invalid route', function () {
+      var bus = Minibus.create();
+      
+      var fun = function () {
+        ok(false, 'Should not be called');
+      };
+      
+      var route = bus.on('myevent', fun);
+      
+      throws(
+        function () {
+          bus.off({
+            id: 'foo',
+            key: 'myevent'
+          });
+        },
+        'Throws an error about missing parameters'
+      );
+      
+      throws(
+        function () {
+          bus.off({
+            key: 'myevent',
+            fun: fun
+          });
+        },
+        'Throws an error about missing parameters'
+      );
+      
+      throws(
+        function () {
+          bus.off({
+            id: 'foo',
+            fun: fun
+          });
+        },
+        'Throws an error about missing parameters'
+      );
+    });
+    
+    test('empty event string', function () {
+      expect(1);
+      var bus = Minibus.create();
+      bus.on('', function () {
+        ok('true', 'Should be called once');
+      });
+      bus.emit('');
+      bus.emit(' '); // Should not do anything
+    });
+    
+    test('non-string event key and invalid function', function () {
+      var bus = Minibus.create();
+      var fun = function () {
+        ok(false, 'Should not be called');
+      };
+      
+      throws(
+        function () { bus.on(null, fun); },
+        'Should throw an error about invalid event key'
+      );
+      
+      throws(
+        function () { bus.on(0, fun); },
+        'Should throw an error about invalid event key'
+      );
+      
+      throws(
+        function () { bus.on({foo:'bar'}, fun); },
+        'Should throw an error about invalid event key'
+      );
+      
+      throws(
+        function () { bus.on({foo:'bar'}, fun); },
+        'Should throw an error about invalid event key'
+      );
+      
+      throws(
+        function () { bus.on('event'); },
+        'Should throw an error about missing handler function.'
+      );
+      
+      throws(
+        function () { bus.on('event', 'not-a-function'); },
+        'Should throw an error about invalid handler function.'
+      );
     });
   </script>
 </body>

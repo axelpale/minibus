@@ -6,7 +6,7 @@ Minimal Message Dispatcher for JavaScript.
 
 ## Features
 
-- Lightweight, less than 500 bytes when compressed.
+- Lightweight, less than 600 bytes when compressed.
 - Create a message bus by `var bus = Minibus.create()`
 - Bind event handlers by `bus.on('myevent', function () { ... })`
 - Emit events by `bus.emit('myevent')`
