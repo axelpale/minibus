@@ -81,6 +81,35 @@
       setTimeout(start, 0); // handler may not be called immediately.
     });
     
+    asyncTest('once', function testCase() {
+      expect(1); // Only one assertion
+      var called = false;
+      var bus = Minibus.create();
+      bus.once('myevent', function () {
+        ok(!called, 'Should be executed once.');
+        called = true;
+      });
+      bus.emit('myevent');
+      bus.emit('myevent');
+      setTimeout(start, 0); // exec all in event stack stack
+    });
+    
+    asyncTest('once and then on', function testCase() {
+      expect(3);
+      called = 0;
+      var bus = Minibus.create();
+      var fun = function (num) {
+        ok(called === num, 'Should be executed thrice.');
+        called += 1;
+      };
+      bus.once('myevent', fun);
+      bus.on('myevent', fun);
+      bus.emit('myevent', 0);
+      bus.emit('myevent', 1);
+      bus.emit('myevent', 2);
+      setTimeout(start, 0); // exec all in event stack stack
+    });
+    
   </script>
 </body>
 </html>

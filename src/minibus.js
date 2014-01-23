@@ -76,6 +76,7 @@ var Minibus = (function () {
       }
       
       if (exists) {
+        routes[i].limit = 0; // Might be set with once in the first place
         return routes[i];
       }
     } else {
@@ -88,7 +89,8 @@ var Minibus = (function () {
     var route = {
       id : Identity.create(),
       key: key,
-      fun: fun
+      fun: fun,
+      limit: 0 // zero means no limit
     };
     
     this.keyRoutes[key].push(route);
@@ -118,7 +120,70 @@ var Minibus = (function () {
   
   
   var _once = function (key, fun) {
-    throw 'Not implemented.';
+    // Bind handler function that can be fired only once.
+    // 
+    // Parameter
+    //   key
+    //     String. The event name.
+    //   fun
+    //     Function to be executed when the event happens.
+    // 
+    // Throws
+    //   InvalidParameterError
+    //   
+    // Return
+    //   route object
+    
+    // Validate parameters
+    var valid = false;
+    if (typeof key === 'string' &&
+        typeof fun === 'function') {
+      valid = true;
+    }
+    if (!valid) {
+      throw {
+        name: 'InvalidParameterError',
+        message: 'Invalid or insufficient parameters. ' +
+                 'Event must be a string and handler a function. ' +
+                 'Instead they are ' + (typeof key) + ' and ' + (typeof fun) +
+                 '.'
+      };
+    }
+    
+    if (this.keyRoutes.hasOwnProperty(key)) {
+      // Do not add if the route already exists.
+      var routes, i, exists;
+      routes = this.keyRoutes[key];
+      exists = false;
+      for (i = 0; i < routes.length; i += 1) {
+        if (fun === routes[i].fun) {
+          exists = true;
+          break;
+        }
+      }
+      
+      if (exists) {
+        routes[i].limit = 1; // Might be set with on
+        return routes[i];
+      }
+    } else {
+      // First
+      this.keyRoutes[key] = [];
+    }
+    // Assert this.keyRoutes[key] is array
+    
+    // Create route
+    var route = {
+      id : Identity.create(),
+      key: key,
+      fun: fun,
+      limit: 1 // Call only once
+    };
+    
+    this.keyRoutes[key].push(route);
+    this.idRoutes[route.id] = route;
+    
+    return route;
   };
   
   // See Node.js events.EventEmitter.once
@@ -214,7 +279,7 @@ var Minibus = (function () {
     var i, routeId, routeKey, routeFun;
     var routes = this.keyRoutes[realKey];
     
-    // If only key is specified, unbind all the handlers
+    // If only the key is specified, unbind all the handlers
     if (offAll) {
       for (i = 0; i < routes.length; i += 1) {
         routeId = routes[i].id;
@@ -284,7 +349,7 @@ var Minibus = (function () {
     // Return
     //   this
     //     For chaining.
-    var emitArgs, i, routes, context;
+    var emitArgs, i, route, routes, context;
     
     if (this.keyRoutes.hasOwnProperty(key)) {
       // Collect passed arguments. Drop the 'key' argument.
@@ -305,10 +370,27 @@ var Minibus = (function () {
         context = {};
       }
       
-      // Execute each route
-      routes = this.keyRoutes[key];
+      // Execute each route.
+      // Copy the array because there is off calls that modify the
+      // original array.
+      // See http://stackoverflow.com/a/7486130
+      routes = this.keyRoutes[key].slice(0); // Copy
       for (i = 0; i < routes.length; i += 1) {
-        routes[i].fun.apply(context, emitArgs);
+        route = routes[i];
+        
+        // Remove if once.
+        // Execute off before apply because additional ons or onces
+        // may be set in the applied function.
+        if (route.limit > 0) {
+          
+          if (route.limit === 1) {
+            this.off(route);
+          } else {
+            route.limit -= 1;
+          }
+        }
+        
+        route.fun.apply(context, emitArgs);
       }
     }
     // else

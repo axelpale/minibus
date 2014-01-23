@@ -1,2 +1,2 @@
   // Version
-  Minibus.version = '2.2.0';
+  Minibus.version = '2.3.0';
