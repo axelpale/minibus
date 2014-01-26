@@ -36,9 +36,17 @@ Minimal Message Dispatcher for JavaScript.
     > bus.emit('wakeup', 'Hello ', 'universe.');
     Hello universe.
 
-## Extend
+## Alternative naming
+Influenced by [Node.js](http://nodejs.org/) and [Backbone.js](http://backbonejs.org/).
 
-Extend buses by:
+    > var bus = Minibus.create();
+    > bus.listen('myevent', function () {...});
+    > bus.trigger('myevent');
+    > bus.removeListener('myevent');
+
+## Customise Minibus
+
+Customise buses by:
 
     Minibus.extension.myFunction = function (...) {...};
 
