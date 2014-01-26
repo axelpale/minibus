@@ -110,6 +110,26 @@
       setTimeout(start, 0); // exec all in event stack stack
     });
     
+    asyncTest('off all', function testCase() {
+      expect(1);
+      var bus = Minibus.create();
+      bus.on('myevent1', function handler() {
+        ok(true, 'Should be called once.');
+      });
+      bus.on('myevent2', function handler() {
+        ok(false, 'Should not be called');
+      });
+      bus.once('myevent3', function handler() {
+        ok(false, 'Should not be called');
+      });
+      
+      bus.emit('myevent1');
+      bus.off();
+      bus.emit('myevent2');
+      bus.emit('myevent1');
+      setTimeout(start, 0); // handler may not be called immediately.
+    });
+    
   </script>
 </body>
 </html>
