@@ -55,6 +55,12 @@ After that you can:
     var bus = Minibus.create();
     bus.myFunction();
 
+## Cause and effect
+
+Minibus is based on the following paradigm. Events happen, they are the cause. The routes point out the effects of the causes. Handler functions describe the effects. The effects may trigger new events, giving again a cause for a new set of effects.
+
+![Paradigm for using Minibus and events in general](../master/img/eventmodel.png?raw=true)
+
 ## History
 
 The development of Minibus started in 2013-02-15 after hassling with [EventBus](https://github.com/krasimir/EventBus) and [Socket.IO](http://socket.io/). They either had complex API or solved too much.
