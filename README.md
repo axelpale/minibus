@@ -8,12 +8,12 @@ Minimal Message Dispatcher for JavaScript.
 
 - Lightweight, less than 600 bytes when compressed.
 - Create a message bus by `var bus = Minibus.create()`
-- Bind event handlers by `bus.on('out-of-fuel', function () { ... })`
-- Bind only once by `bus.once('out-of-fuel', function () { ... })`
-- Emit events by `bus.emit('out-of-fuel')`
-- Pass parameters to handlers by `bus.emit('out-of-fuel', param1, param2, ...)`
-- Unbind the handlers by `bus.off('out-of-fuel')`
-- Unbind specific handler by first `var route = bus.on('out-of-fuel', function () { ... })` and then `bus.off(route)`
+- Bind event handlers by `bus.on('myevent', function () { ... })`
+- Bind only once by `bus.once('myevent', function () { ... })`
+- Emit events by `bus.emit('myevent')`
+- Pass parameters to handlers by `bus.emit('myevent', param1, param2, ...)`
+- Unbind the handlers by `bus.off('myevent')`
+- Unbind specific handler by first `var route = bus.on('myevent', function () { ... })` and then `bus.off(route)`
 - Unbind everything by `bus.off()`
 
 ## Basic example
