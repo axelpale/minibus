@@ -8,45 +8,45 @@ Minimal Message Dispatcher for JavaScript.
 
 - Lightweight, less than 600 bytes when compressed.
 - Create a message bus by `var bus = Minibus.create()`
-- Bind event handlers by `bus.on('myevent', function () { ... })`
-- Bind only once by `bus.once('myevent', function () { ... })`
-- Emit events by `bus.emit('myevent')`
-- Pass parameters to handlers by `bus.emit('myevent', param1, param2, ...)`
-- Unbind the handlers by `bus.off('myevent')`
-- Unbind specific handler by first `var route = bus.on('myevent', function () { ... })` and then `bus.off(route)`
+- Bind event handlers by `bus.on('out-of-fuel', function () { ... })`
+- Bind only once by `bus.once('out-of-fuel', function () { ... })`
+- Emit events by `bus.emit('out-of-fuel')`
+- Pass parameters to handlers by `bus.emit('out-of-fuel', param1, param2, ...)`
+- Unbind the handlers by `bus.off('out-of-fuel')`
+- Unbind specific handler by first `var route = bus.on('out-of-fuel', function () { ... })` and then `bus.off(route)`
 - Unbind everything by `bus.off()`
 
 ## Basic example
 
     > var bus = Minibus.create();
-    > var route = bus.on('myevent', function () {
-        console.log('Hello universe.');
+    > var route = bus.on('out-of-fuel', function () {
+        console.log('Hitchhike.');
       });
-    > bus.emit('myevent');
-    Hello universe.
+    > bus.emit('out-of-fuel');
+    Hitchhike.
     > bus.off(route);
-    > bus.emit('myevent');
+    > bus.emit('out-of-fuel');
     (nothing)
 
 ## Passing parameters
 
-    > bus.on('wakeup', function (greet, place) {
-        console.log(greet + place);
+    > bus.on('flat-tire', function (frontOrBack, side) {
+        console.log('The ' + frontOrBack + ' ' + side + ' tire blew out');
       });
-    > bus.emit('wakeup', 'Hello ', 'universe.');
-    Hello universe.
+    > bus.emit('flat-tire', 'front', 'right');
+    The front right tire blew out.
 
 ## Alternative naming
 Influenced by [Node.js](http://nodejs.org/) and [Backbone.js](http://backbonejs.org/).
 
     > var bus = Minibus.create();
-    > bus.listen('myevent', function () {...});
-    > bus.trigger('myevent');
-    > bus.removeListener('myevent');
+    > bus.listen('out-of-fuel', function () {...});
+    > bus.trigger('out-of-fuel');
+    > bus.removeListener('out-of-fuel');
 
-## Customise Minibus
+## Customize Minibus
 
-Customise buses by:
+Customize buses by:
 
     Minibus.extension.myFunction = function (...) {...};
 
@@ -57,7 +57,7 @@ After that you can:
 
 ## Cause and effect
 
-Minibus is based on the following paradigm. Events happen, they are the cause. The routes point out the effects of the causes. Handler functions describe the effects. The effects may trigger new events, giving again a cause for a new set of effects.
+Minibus is based on the following paradigm. Events happen, they represent the cause. The routes point out the effects of the causes. Handler functions encapsulate the effects and the code within them describes the effects. The effects may trigger new events, giving again a cause for a new set of effects.
 
 ![Paradigm for using Minibus and events in general](../master/img/eventmodel.png?raw=true)
 
