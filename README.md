@@ -6,7 +6,7 @@ Minimal Message Dispatcher for JavaScript.
 
 ## Features
 
-- Lightweight, less than 600 bytes when compressed.
+- Lightweight, about 600 bytes when compressed.
 - Compatible with browsers, [Node](http://nodejs.org/), [CommonJS](http://wiki.commonjs.org/wiki/CommonJS) and [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD).
 - Create a message bus by `var bus = Minibus.create()`
 - Bind event handlers by `bus.on('myevent', function () { ... })`
@@ -56,15 +56,18 @@ After that you can:
     var bus = Minibus.create();
     bus.myFunction();
 
-## Cause and effect
-
-Minibus is based on the following paradigm. Events happen, they represent the cause. The routes point out the effects of the causes. Handler functions encapsulate the effects and the code within them describes the effects. The effects may trigger new events, giving again a cause for a new set of effects.
-
-![Paradigm for using Minibus and events in general](../master/img/eventmodel.png?raw=true)
-
 ## History
 
 The development of Minibus started in 2013-02-15 after hassling with [EventBus](https://github.com/krasimir/EventBus) and [Socket.IO](http://socket.io/). They either had complex API or solved too much.
+
+## See also
+
+- [Roadmap](/axelpale/minibus/blob/master/doc/roadmap.md)
+- [Background theory](/axelpale/minibus/blob/master/doc/theory.md)
+
+## Versioning
+
+[Semantic Versioning 2.0.0](http://semver.org/)
 
 ## License
 
