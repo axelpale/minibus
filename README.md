@@ -1,12 +1,13 @@
-# minibus.js
+# minibus.js<sup>v2.4.0</sup>
 
 Minimal Message Dispatcher for JavaScript.
 
-![Minibus.js](../master/img/minibus.png?raw=true)
+![minibus.js](../master/img/minibus.png?raw=true)
 
 ## Features
 
 - Lightweight, less than 600 bytes when compressed.
+- Compatible with browsers, [Node](http://nodejs.org/), [CommonJS](http://wiki.commonjs.org/wiki/CommonJS) and [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD).
 - Create a message bus by `var bus = Minibus.create()`
 - Bind event handlers by `bus.on('myevent', function () { ... })`
 - Bind only once by `bus.once('myevent', function () { ... })`

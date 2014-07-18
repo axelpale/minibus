@@ -9,9 +9,8 @@
  *   npm install -g grunt-cli   # may require sudo
  */
 
-'use strict';
-
 module.exports = function(grunt) {
+  'use strict';
   
   // Project configuration.
   grunt.initConfig({
@@ -115,8 +114,8 @@ module.exports = function(grunt) {
         options: {
           patterns: [
             {
-              match: /Minibus\.version\s=\s'\d\.\d\.\d'/,
-              replacement: "Minibus.version = '<%= pkg.version %>'",
+              match: /\.version\s*=\s*'\d+\.\d+\.\d+'/,
+              replacement: ".version = '<%= pkg.version %>'",
               expression: true // use RegExp
             }
           ]
@@ -125,6 +124,23 @@ module.exports = function(grunt) {
           {
             src: ['src/version.js'],
             dest: 'src/version.js'
+          }
+        ]
+      },
+      readme: {
+        options: {
+          patterns: [
+            {
+              match: />v\d+\.\d+\.\d+</,
+              replacement: ">v<%= pkg.version %><",
+              expression: true // use RegExp
+            }
+          ]
+        },
+        files: [
+          {
+            src: ['README.md'],
+            dest: 'README.md'
           }
         ]
       }

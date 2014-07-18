@@ -1,6 +1,6 @@
 {
   "name": "minibus",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "A Minimal Message Dispatcher for JavaScript.",
   "homepage": "https://github.com/axelpale/minibus",
   "main": "minibus.js",

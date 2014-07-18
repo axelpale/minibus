@@ -1,2 +1,2 @@
   // Version
-  Minibus.version = '2.3.0';
+  exports.version = '2.4.0';
