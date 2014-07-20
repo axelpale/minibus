@@ -2,7 +2,7 @@
 
 Minimal Message Dispatcher for JavaScript.
 
-![minibus.js](../master/img/minibus.png?raw=true)
+![minibus.js](../master/doc/img/minibus.png?raw=true)
 
 
 ## Basic example
@@ -49,7 +49,7 @@ Minimal Message Dispatcher for JavaScript.
     define(['scripts/minibus'], function (Minibus) { ... });
 
 
-## Passing parameters
+## Emitting parameters
 
     > bus.on('flat-tire', function (frontOrBack, side) {
         console.log('The ' + frontOrBack + ' ' + side + ' tire blew out');
