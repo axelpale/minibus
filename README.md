@@ -82,8 +82,8 @@ The development of Minibus started in 2013-02-15 after hassling with [EventBus](
 
 ## See also
 
-- [Roadmap](/axelpale/minibus/blob/master/doc/roadmap.md)
-- [Background theory](/axelpale/minibus/blob/master/doc/theory.md)
+- [Roadmap](doc/roadmap.md)
+- [Background theory](doc/theory.md)
 
 ## Versioning
 
