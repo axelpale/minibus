@@ -4,6 +4,20 @@ Minimal Message Dispatcher for JavaScript.
 
 ![minibus.js](../master/img/minibus.png?raw=true)
 
+
+## Basic example
+
+    > var bus = Minibus.create();
+    > var route = bus.on('out-of-fuel', function () {
+        console.log('Hitchhike.');
+      });
+    > bus.emit('out-of-fuel');
+    Hitchhike.
+    > bus.off(route);
+    > bus.emit('out-of-fuel');
+    (nothing)
+
+
 ## Features
 
 - Lightweight, about 600 bytes when compressed.
@@ -17,17 +31,23 @@ Minimal Message Dispatcher for JavaScript.
 - Unbind specific handler by first `var route = bus.on('myevent', function () { ... })` and then `bus.off(route)`
 - Unbind everything by `bus.off()`
 
-## Basic example
 
-    > var bus = Minibus.create();
-    > var route = bus.on('out-of-fuel', function () {
-        console.log('Hitchhike.');
-      });
-    > bus.emit('out-of-fuel');
-    Hitchhike.
-    > bus.off(route);
-    > bus.emit('out-of-fuel');
-    (nothing)
+## Installation
+
+### Browsers
+
+    <script src="scripts/minibus.js"></script>
+
+### CommonJS & Node.js
+
+    $ npm install minibus
+    ---
+    > var Minibus = require('minibus');
+
+### AMD & Require.js
+
+    define(['scripts/minibus'], function (Minibus) { ... });
+
 
 ## Passing parameters
 
