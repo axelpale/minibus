@@ -20,7 +20,7 @@ Route is just a string
 ----------------------
 In 2.x.x the route object returned by "on" is a object having properties like the event key, the handler function, route id and such. This allows the user to modify the route freely but on the other hand gives lot of room for an error. For example resetting the handler to a string may cause weird behaviour.
 
-To capsule the inner workings of Minibus more securely, route object should contain only the identity of the route. Natural choice would be an unique string.
+To encapsulate the inner workings of Minibus more securely, route object should contain only the identity of the route. Natural choice would be an unique string.
 
 Sync and async calls
 --------------------
