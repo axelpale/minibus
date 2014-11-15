@@ -76,6 +76,13 @@ After that you can:
     var bus = Minibus.create();
     bus.myFunction();
 
+## Repository branches
+
+- 'master' is for production-ready releases.
+- 'develop' is for feature development
+
+This convention follows a [successful git branching model](http://nvie.com/posts/a-successful-git-branching-model/).
+
 ## History
 
 The development of Minibus started in 2013-02-15 after hassling with [EventBus](https://github.com/krasimir/EventBus) and [Socket.IO](http://socket.io/). They either had complex API or solved too much.
