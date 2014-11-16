@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Minibus.js test suite</title>
+  <link rel="stylesheet" href="lib/qunit-1.13.0.css">
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+  <script src="lib/qunit-1.13.0.js"></script>
+  <script src="../minibus.js"></script>
+  <script type="text/javascript">
+
+    /*******************************************************
+     * Tests about how on, once emit and off work together *
+     *******************************************************/
+
+    asyncTest('on, emit, off, emit', function () {
+      expect(2); // Expect a number of assertions.
+      var bus = Minibus.create();
+      bus.on('myevent', function () {
+        ok(true, 'Call me.');
+      });
+      bus.emit('myevent');
+      bus.off('myevent');
+      bus.emit('myevent');
+      setTimeout(function () {
+        // Execution of this function is placed last in js exec queue.
+        ok(true, 'Call me.');
+        start();
+      }, 0);
+    });
+
+    asyncTest('on, off a route, emit', function () {
+      expect(2); // Expect a number of assertions.
+      var bus = Minibus.create();
+      var route = bus.on('myevent', function () {
+        ok(false, 'Do not call me.');
+      });
+      bus.on('myevent', function () {
+        ok(true, 'Call me.');
+      });
+      bus.off(route);
+      bus.emit('myevent');
+      setTimeout(function () {
+        // Execution of this function is placed last in js exec queue.
+        ok(true, 'Call me.');
+        start();
+      }, 0);
+    });
+
+    asyncTest('once, emit, emit', function () {
+      expect(2); // Expect a number of assertions.
+      var bus = Minibus.create();
+      bus.once('myevent', function () {
+        ok(true, 'Call me once.');
+      });
+      bus.emit('myevent'); // calls
+      bus.emit('myevent'); // does not call
+      setTimeout(function () {
+        // Execution of this function is placed last in js exec queue.
+        ok(true, 'Call me.');
+        start();
+      }, 0);
+    });
+
+    asyncTest('once, off, emit', function () {
+      expect(1); // Expect a number of assertions.
+      var bus = Minibus.create();
+      bus.once('myevent', function () {
+        ok(false, 'Call me once.');
+      });
+      bus.off('myevent');
+      bus.emit('myevent');
+      setTimeout(function () {
+        // Execution of this function is placed last in js exec queue,
+        // and therefore the event handler of the once call should be
+        // called if the off does not work.
+        ok(true, 'Call me.');
+        start();
+      }, 0);
+    });
+
+    asyncTest('on, emit with args', function () {
+      expect(3); // Expect a number of assertions.
+      var bus = Minibus.create();
+      bus.on('myevent', function (foo, bar, baz) {
+        ok(foo === 'foo');
+        ok(bar === 'bar');
+        ok(baz === 'baz');
+        start();
+      });
+      bus.emit('myevent', 'foo', 'bar', 'baz');
+    });
+
+    asyncTest('on with event string array, off', function () {
+      expect(4); // Expect a number of assertions.
+      var bus = Minibus.create();
+      var route = bus.on(['foo', 'bar'], function () {
+        ok(true, 'Call me.');
+      });
+      bus.emit('foo'); // calls
+      bus.emit('bar'); // calls
+      bus.off('foo');
+      bus.emit('foo'); // nothing happens
+      bus.emit('bar'); // calls
+      bus.off(route);
+      bus.emit('foo'); // nothing happens
+      bus.emit('bar'); // nothing happens
+      setTimeout(function () {
+        // Execution of this function is placed last in js exec queue,
+        // and therefore it is executed after effects of the emits.
+        ok(true, 'Call me.');
+        start();
+      }, 0);
+    });
+
+    asyncTest('on 1, on 2, off without params', function () {
+      expect(1); // Expect a number of assertions.
+      var bus = Minibus.create();
+      bus.on('foo', function () {
+        ok(false, 'Do not call me.');
+      });
+      bus.on('bar', function () {
+        ok(false, 'Do not call me.');
+      });
+      bus.off();
+      bus.emit('foo'); // nothing happens
+      bus.emit('bar'); // nothing happens
+      setTimeout(function () {
+        ok(true, 'Call me.');
+        start();
+      }, 0);
+    });
+
+    asyncTest('how on and once work with off', function () {
+      // on 1, once 1,
+      // emit 1 -> both fire,
+      // emit 1 -> one fires
+      var bus = Minibus.create();
+      var i = 0;
+      var f = function () { i += 1; };
+      bus.on('foo', f);
+      bus.once('foo', f);
+      bus.emit('foo'); // calls f twice
+      bus.emit('foo'); // calls f once
+      setTimeout(function () {
+        ok(i === 3, 'Called f right number of times.');
+        start();
+      }, 0);
+    });
+
+    asyncTest('async off', function () {
+      // Defines what happens if async emit and then off.
+      // A design decision: off needs to be async.
+      var bus = Minibus.create();
+      var i = 0;
+      var f = function () { i += 1; };
+      bus.emit('foo', f);
+      bus.off('foo');
+      setTimeout(function () {
+        ok(i === 0, 'Called f right number of times.');
+        start();
+      }, 0);
+    });
+
+    asyncTest('async off', function () {
+      // Defines what happens if async emit and then off.
+      // A design decision: off needs to be async.
+      var bus = Minibus.create();
+      var i = 0;
+      var f = function () { i += 1; };
+      bus.emit('foo', f); // calls
+      bus.off('foo'); // offSync stops both, not only the second.
+      bus.emit('foo', f); // does not call
+      setTimeout(function () {
+        ok(i === 1, 'Called f right number of times.');
+        start();
+      }, 0);
+    });
+
+    /**********************
+     * Emit related tests *
+     **********************/
+
+    test('emit with no parameters', function () {
+      var bus = Minibus.create();
+      throws(
+        function () { bus.emit(); },
+        'Throws an error about invalid event string'
+      );
+    });
+
+    test('emit with invalid event string', function () {
+      var bus = Minibus.create();
+      throws(
+        function () { bus.emit(42); },
+        'Throws an error about invalid event string'
+      );
+    });
+
+    asyncTest('ensure that emit is async', function () {
+      var bus = Minibus.create();
+      var i = 0;
+      var f = function () { i += 1; };
+      bus.on('foo', f);
+      bus.emit('foo');
+      ok(i === 0);
+      setTimeout(function () {
+        ok(i === 1, 'Called f right number of times.');
+        start();
+      }, 0);
+    });
+
+    asyncTest('ensure that recursion loop works', function () {
+      var bus = Minibus.create();
+      var i = 0;
+      var foo = function () {
+        bus.emit('bar'); // If sync, next line would never be called.
+        i += 1;
+      };
+      var bar = function () {
+        if (i < 100000) {
+          bus.emit('foo');
+        } else {
+          // Ensures that recursion ends.
+          start();
+        }
+      };
+      bus.on('foo', foo);
+      bus.on('bar', bar);
+      bus.emit('foo');
+    });
+
+    /********************
+     * On related tests *
+     ********************/
+
+    test('on with invalid event string', function () {
+      var bus = Minibus.create();
+      var i = 0;
+      var f = function () { i += 1; };
+      throws(
+        function () { bus.on([], f); },
+        'Throws an error about invalid event string'
+      );
+      throws(
+        function () { bus.on(['foo', 42], f); },
+        'Throws an error about invalid event string'
+      );
+      throws(
+        function () { bus.on(42, f); },
+        'Throws an error about invalid event string'
+      );
+      ok(i === 0, 'f is not called');
+    });
+
+    test('on with invalid handler function', function () {
+      var bus = Minibus.create();
+      throws(
+        function () { bus.on('foo'); },
+        'Throws an error about invalid event handler function'
+      );
+      throws(
+        function () { bus.on('foo', {}); },
+        'Throws an error about invalid event handler function'
+      );
+    });
+
+    /**********************
+     * Once related tests *
+     **********************/
+
+    test('once with invalid event string', function () {
+      var bus = Minibus.create();
+      var i = 0;
+      var f = function () { i += 1; };
+      throws(
+        function () { bus.once([], f); },
+        'Throws an error about invalid event string'
+      );
+      throws(
+        function () { bus.once(['foo', 42], f); },
+        'Throws an error about invalid event string'
+      );
+      throws(
+        function () { bus.once(42, f); },
+        'Throws an error about invalid event string'
+      );
+      ok(i === 0, 'f is not called');
+    });
+
+    test('once with invalid handler function', function () {
+      var bus = Minibus.create();
+      throws(
+        function () { bus.once('foo'); },
+        'Throws an error about invalid event handler function'
+      );
+      throws(
+        function () { bus.once('foo', {}); },
+        'Throws an error about invalid event handler function'
+      );
+    });
+
+    /*********************
+     * Off related tests *
+     *********************/
+
+    asyncTest('off with an unknown route string', function () {
+      var bus = Minibus.create();
+      bus.off('foo'); // no error
+      setTimeout(function () {
+        start();
+      }, 0);
+    });
+
+    test('off with invalid route string', function () {
+      var bus = Minibus.create();
+      throws(
+        function () { bus.off(42); },
+        'Throws an error about invalid route string.'
+      )
+    });
+
+    /********************************
+     * Aliases for emit, on and off *
+     ********************************/
+
+    asyncTest('alternative function names', function () {
+      var bus = Minibus.create();
+      var i = 0;
+      var f = function () { i += 1; };
+      bus.listen('foo', f);
+      bus.trigger('foo');
+      bus.removeListener('foo');
+      bus.trigger('foo');
+      setTimeout(function () {
+        ok(i === 1, 'Called f right number of times.');
+        start();
+      }, 0); // handler may not be called immediately.
+    });
+
+    /*************************
+     * Version related tests *
+     *************************/
+
+    test('version', function () {
+      var versRegExp = /^\d+\\.\d+\\.\d$/;
+      ok(versRegExp.test(Minibus.version), 'Correct version format.');
+    });
+
+    /***************************
+     * Extension related tests *
+     ***************************/
+
+    test('extension', function testCase() {
+      var bus = Minibus.create();
+      Minibus.extension.myFunction = function () {
+        return 'foo';
+      };
+      strictEqual(bus.myFunction(), 'foo', 'Function is callable.');
+    });
+
+  </script>
+</body>
+</html>
