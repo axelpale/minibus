@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <title>Minibus.js test suite</title>
-  <link rel="stylesheet" href="lib/qunit-1.13.0.css">
+  <link rel="stylesheet" href="../node_modules/qunitjs/qunit/qunit.css">
 </head>
 <body>
   <div id="qunit"></div>
   <div id="qunit-fixture"></div>
-  <script src="lib/qunit-1.13.0.js"></script>
+  <script src="../node_modules/qunitjs/qunit/qunit.js"></script>
   <script src="../minibus.js"></script>
   <script type="text/javascript">
 
@@ -164,7 +164,7 @@
         start();
       });
     });
-/*
+
     //*********************
     // Emit related tests *
     //*********************
@@ -192,13 +192,14 @@
       bus.on('foo', f);
       bus.emit('foo');
       ok(i === 0);
-      setTimeout(function () {
+      wait(function () {
         ok(i === 1, 'Called f right number of times.');
         start();
-      }, 0);
+      });
     });
 
     asyncTest('ensure that recursion loop works', function () {
+      expect(0); // No assertions needed.
       var bus = Minibus.create();
       var i = 0;
       var foo = function () {
@@ -206,7 +207,7 @@
         i += 1;
       };
       var bar = function () {
-        if (i < 100000) {
+        if (i < 10) {
           bus.emit('foo');
         } else {
           // Ensures that recursion ends.
@@ -217,6 +218,7 @@
       bus.on('bar', bar);
       bus.emit('foo');
     });
+/*
 
     //*******************
     // On related tests *
@@ -295,9 +297,9 @@
     asyncTest('off with an unknown route string', function () {
       var bus = Minibus.create();
       bus.off('foo'); // no error
-      setTimeout(function () {
+      wait(function () {
         start();
-      }, 0);
+      });
     });
 
     test('off with invalid route string', function () {
@@ -307,6 +309,7 @@
         'Throws an error about invalid route string.'
       )
     });
+*/
 
     //*******************************
     // Aliases for emit, on and off *
@@ -320,12 +323,12 @@
       bus.trigger('foo');
       bus.removeListener('foo');
       bus.trigger('foo');
-      setTimeout(function () {
+      wait(function () {
         ok(i === 1, 'Called f right number of times.');
         start();
-      }, 0); // handler may not be called immediately.
+      }); // handler may not be called immediately.
     });
-*/
+
     //************************
     // Version related tests *
     //************************
