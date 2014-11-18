@@ -18,14 +18,14 @@
 
     var wait = function (callback) {
       // Execution of this function is placed last in js exec queue.
-      setTimeout(callback, 0)
+      setTimeout(callback, 0);
     };
 
     //*****************
     // QUnit settings *
     //*****************
     // See also Gruntfile.qunit
-    QUnit.config.testTimeout = 10000;
+    //QUnit.config.testTimeout = 3000;
 
     //******************************************************
     // Tests about how on, once emit and off work together *
@@ -189,36 +189,50 @@
       });
     });
 
-    QUnit.asyncTest('First emit argument is the context', function (assert) {
+    //******************
+    // Context related *
+    //******************
+
+    QUnit.asyncTest('Context is shared between the bus ' +
+                    'event handlers functions', function (assert) {
+      QUnit.expect(0);
       var bus = Minibus.create();
-      var c = { i: 0 };
-      var f = function () { this.i += 1; }
-      bus.on('foo', f);
-      bus.emit('foo', c);
-      wait(function () {
-        assert.ok(c.i === 1, 'Called f wrong number of times: ' + c.i);
-        QUnit.start();
+      bus.on('foo', function () {
+        this.msg = 'Hello';
+        bus.emit('bar');
       });
+      bus.on('bar', function () {
+        if (this.msg === 'Hello') {
+          QUnit.start();
+        }
+      });
+      bus.emit('foo');
     });
 
-    QUnit.asyncTest('Same context object is given to event handlers ' +
-                    'if context is not specified.', function (assert) {
+    QUnit.asyncTest('Buses do not share bus context', function (assert) {
       var bus = Minibus.create();
-      var i = '';
-      var f = function () {
-        if (this.hasOwnProperty('msg')) {
-          i = this.msg;
-        } else {
-          this.msg = 'hello';
-        }
-      };
-      bus.on('foo', f);
-      bus.on('foo', f);
-      bus.emit('foo');
-      wait(function () {
-        assert.equal(i, 'hello', 'Event handlers do not share context.');
+      var hippiebus = Minibus.create();
+      bus.on('start', function () {
+        this['iDeleted'] = 'hello';
+        this['hippiesDeleted'] = 'hello';
+        hippiebus.emit('delete');
+        bus.emit('delete');
+      });
+      bus.on('delete', function () {
+        // this = {}; // is not valid javascript
+        delete this['iDeleted'];
+        bus.emit('finish');
+      });
+      hippiebus.on('delete', function () {
+        delete this['iDeleted'];
+        delete this['hippiesDeleted'];
+      });
+      bus.on('finish', function () {
+        ok(!this.hasOwnProperty('iDeleted'), 'Error: context is not erased.');
+        ok(this.hasOwnProperty('hippiesDeleted'), 'Error: context is erased.');
         QUnit.start();
       });
+      bus.emit('start');
     });
 
     //*********************

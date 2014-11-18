@@ -11,6 +11,9 @@ var Bus = function () {
 
   // route string -> route object
   this.routeMap = {};
+
+  // free namespace shared between the event handlers on the bus.
+  this.busContext = {};
 };
 
 exports.create = function () {
@@ -62,7 +65,7 @@ var _emit = function (eventString) {
   // Throws
   //   InvalidEventStringError
   //     if given event string is not a string e.g. undefined
-  var emitArgs, i, context, subRouteMap, routeString, eventHandlers;
+  var emitArgs, i, subRouteMap, routeString, eventHandlers, busContext;
 
   if (typeof eventString !== 'string') {
     throw new InvalidEventStringError(eventString);
@@ -78,19 +81,6 @@ var _emit = function (eventString) {
     emitArgs.push(arguments[i]);
   }
 
-  // First argument is used as the context if it is an object.
-  // ECMA Script requires the context to be an object.
-  //   See http://stackoverflow.com/a/15027847/638546
-  if (emitArgs.length > 0) {
-    context = emitArgs[0];
-    if (typeof context !== 'object') {
-      context = {};
-    }
-  } else {
-    context = {};
-  }
-  // Assert: context is an object.
-
   // Collect handlers synchronously to prevent additional
   // handlers becoming executed if those become added between
   // emit call and setTimeout.
@@ -102,9 +92,11 @@ var _emit = function (eventString) {
     }
   }
 
+  // All event handlers on the bus share a same bus context.
+  busContext = this.busContext;
   setTimeout(function () {
     for (var i = 0; i < eventHandlers.length; i += 1) {
-      eventHandlers[i].apply(context, emitArgs);
+      eventHandlers[i].apply(busContext, emitArgs);
     }
   }, 0);
 
@@ -348,7 +340,7 @@ var _once = function (eventString, eventHandler) {
     if (!called) {
       called = true; // Required to prevent duplicate sync calls
       that.off(routeString);
-      // Apply. Use the context given by emit.
+      // Apply. Use the context given by emit to embrace code dryness.
       eventHandler.apply(this, arguments);
     }
   });
