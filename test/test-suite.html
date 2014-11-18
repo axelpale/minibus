@@ -108,7 +108,7 @@
       var i = 0;
       var f = function () { i += 1; };
       var route = bus.on(['foo', 'bar'], f);
-      
+
       assert.ok(Array.isArray(route), 'Route is not an array: ' + route);
 
       bus.emit('foo'); // calls
@@ -174,6 +174,53 @@
       });
     });
 
+    QUnit.asyncTest('multiple ons with same event string ' +
+                    'and handler function', function (assert) {
+      var bus = Minibus.create();
+      var i = 0;
+      var f = function () { i += 1; };
+      bus.on('foo', f);
+      bus.on('foo', f);
+      bus.on(['foo', 'foo'], f);
+      bus.emit('foo');
+      wait(function () {
+        assert.ok(i === 4, 'Called f wrong number of times: ' + i);
+        QUnit.start();
+      });
+    });
+
+    QUnit.asyncTest('First emit argument is the context', function (assert) {
+      var bus = Minibus.create();
+      var c = { i: 0 };
+      var f = function () { this.i += 1; }
+      bus.on('foo', f);
+      bus.emit('foo', c);
+      wait(function () {
+        assert.ok(c.i === 1, 'Called f wrong number of times: ' + c.i);
+        QUnit.start();
+      });
+    });
+
+    QUnit.asyncTest('Same context object is given to event handlers ' +
+                    'if context is not specified.', function (assert) {
+      var bus = Minibus.create();
+      var i = '';
+      var f = function () {
+        if (this.hasOwnProperty('msg')) {
+          i = this.msg;
+        } else {
+          this.msg = 'hello';
+        }
+      };
+      bus.on('foo', f);
+      bus.on('foo', f);
+      bus.emit('foo');
+      wait(function () {
+        assert.equal(i, 'hello', 'Event handlers do not share context.');
+        QUnit.start();
+      });
+    });
+
     //*********************
     // Emit related tests *
     //*********************
@@ -190,6 +237,14 @@
       var bus = Minibus.create();
       assert.throws(
         function () { bus.emit(42); },
+        'Throws an error about invalid event string'
+      );
+    });
+
+    QUnit.test('emit with event string array', function (assert) {
+      var bus = Minibus.create();
+      assert.throws(
+        function () { bus.emit(['foo', 'bar']); },
         'Throws an error about invalid event string'
       );
     });
@@ -266,6 +321,16 @@
         function () { bus.on('foo', {}); },
         'Throws an error about invalid event handler function'
       );
+    });
+
+    QUnit.test('on returns array if an array is given', function (assert) {
+      var bus, f, route;
+      bus = Minibus.create();
+      f = function () {};
+      route = bus.on('', f);
+      assert.ok(!Array.isArray(route), 'Route is not a route string.');
+      route = bus.on([''], f);
+      assert.ok(Array.isArray(route), 'Route is not an array: ' + route);
     });
 
     //*********************

@@ -62,7 +62,7 @@ var _emit = function (eventString) {
   // Throws
   //   InvalidEventStringError
   //     if given event string is not a string e.g. undefined
-  var subRouteMap, routeString, emitArgs, i, eventHandlers;
+  var emitArgs, i, context, subRouteMap, routeString, eventHandlers;
 
   if (typeof eventString !== 'string') {
     throw new InvalidEventStringError(eventString);
@@ -78,6 +78,19 @@ var _emit = function (eventString) {
     emitArgs.push(arguments[i]);
   }
 
+  // First argument is used as the context if it is an object.
+  // ECMA Script requires the context to be an object.
+  //   See http://stackoverflow.com/a/15027847/638546
+  if (emitArgs.length > 0) {
+    context = emitArgs[0];
+    if (typeof context !== 'object') {
+      context = {};
+    }
+  } else {
+    context = {};
+  }
+  // Assert: context is an object.
+
   // Collect handlers synchronously to prevent additional
   // handlers becoming executed if those become added between
   // emit call and setTimeout.
@@ -91,11 +104,10 @@ var _emit = function (eventString) {
 
   setTimeout(function () {
     for (var i = 0; i < eventHandlers.length; i += 1) {
-      eventHandlers[i].apply({}, emitArgs);
+      eventHandlers[i].apply(context, emitArgs);
     }
   }, 0);
 
-  return;
 /*
   // Emit an event to fire the bound handlers.
   // The handlers are executed immediately.
@@ -197,10 +209,12 @@ var _on = function (eventString, eventHandler) {
   //
   // Return
   //   a route string or an array of route strings
-  var i, routeObject, routeString, routeStringArray;
+  var wasArray, i, routeObject, routeString, routeStringArray;
 
   // Turn to array for more general code.
-  if (!isArray(eventString)) {
+  // Store whether parameter was array to return right type of value.
+  wasArray = isArray(eventString);
+  if (!wasArray) {
     eventString = [eventString];
   }
 
@@ -234,10 +248,10 @@ var _on = function (eventString, eventHandler) {
     this.routeMap[routeString] = routeObject;
   }
 
-  if (routeStringArray.length === 1) {
-    return routeStringArray[0];
+  if (wasArray) {
+    return routeStringArray;
   } // else
-  return routeStringArray; // includes the case of empty array []
+  return routeStringArray[0];
 
 /*
   // Validate parameters
