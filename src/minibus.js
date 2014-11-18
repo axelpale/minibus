@@ -30,11 +30,43 @@ var isArray = function (v) {
 
 
 
+// Exceptions
+
+var InvalidEventStringError = function (eventString) {
+  // Usage
+  //   throw new InvalidEventStringError(eventString)
+  this.name = 'InvalidEventStringError';
+  this.message = 'Invalid event string given: ' + eventString;
+};
+
+var InvalidRouteStringError = function (routeString) {
+  // Usage
+  //   throw new InvalidRouteStringError(routeString)
+  this.name = 'InvalidRouteStringError';
+  this.message = 'Invalid route string given: ' + routeString;
+};
+
+var InvalidEventHandlerError = function (eventHandler) {
+  // Usage
+  //   throw new InvalidEventHandlerError(eventHandler)
+  this.name = 'InvalidEventHandlerError';
+  this.message = 'Invalid event handler function given: ' + eventHandler;
+};
+
+
+
 // Member functions. They all are mutators.
 
 
 var _emit = function (eventString) {
+  // Throws
+  //   InvalidEventStringError
+  //     if given event string is not a string e.g. undefined
   var subRouteMap, routeString, emitArgs, i, eventHandlers;
+
+  if (typeof eventString !== 'string') {
+    throw new InvalidEventStringError(eventString);
+  }
 
   if (!this.eventMap.hasOwnProperty(eventString)) {
     return;
@@ -153,23 +185,39 @@ var _on = function (eventString, eventHandler) {
   // Bind an event string(s) to an event handler function.
   //
   // Parameter
-  //   event
+  //   eventString
   //     Event string or array of event strings.
-  //   handler
+  //     Empty array is ok but does nothing.
+  //   eventHandler
   //     Event handler function to be executed when the event is emitted.
   //
   // Throws
   //   InvalidEventStringError
-  //   InvalidEventHandlerFunctionError
+  //   InvalidEventHandlerError
   //
   // Return
   //   a route string or an array of route strings
-  var i, routeObject, routeString;
+  var i, routeObject, routeString, routeStringArray;
 
+  // Turn to array for more general code.
   if (!isArray(eventString)) {
     eventString = [eventString];
   }
 
+  // Validate all eventStrings before mutating anything.
+  // This makes the on call more atomic.
+  for (i = 0; i < eventString.length; i += 1) {
+    if (typeof eventString[i] !== 'string') {
+      throw new InvalidEventStringError(eventString[i]);
+    }
+  }
+
+  // Validate the eventHandler
+  if (typeof eventHandler !== 'function') {
+    throw new InvalidEventHandlerError(eventHandler);
+  }
+
+  routeStringArray = [];
   for (i = 0; i < eventString.length; i += 1) {
     routeObject = {
       eventString: eventString[i],
@@ -177,6 +225,7 @@ var _on = function (eventString, eventHandler) {
     };
 
     routeString = Identity.create();
+    routeStringArray.push(routeString);
 
     if (!this.eventMap.hasOwnProperty(eventString[i])) {
       this.eventMap[eventString[i]] = {};
@@ -185,7 +234,10 @@ var _on = function (eventString, eventHandler) {
     this.routeMap[routeString] = routeObject;
   }
 
-  return routeString;
+  if (routeStringArray.length === 1) {
+    return routeStringArray[0];
+  } // else
+  return routeStringArray; // includes the case of empty array []
 
 /*
   // Validate parameters
@@ -263,7 +315,19 @@ Bus.prototype.listen = _on;
 
 var _once = function (eventString, eventHandler) {
   // Like _on but reacts to emit only once.
+  //
+  // Throws
+  //   InvalidEventStringError
+  //   InvalidEventHandlerError
   var that, routeString, called;
+
+  // Validate the eventHandler. On does the validation also.
+  // Duplicate validation is required because a wrapper function
+  // is feed into on instead the given eventHandler.
+  if (typeof eventHandler !== 'function') {
+    throw new InvalidEventHandlerError(eventHandler);
+  }
+
   that = this;
   called = false;
   routeString = this.on(eventString, function () {
@@ -336,7 +400,9 @@ Bus.prototype.once = _once;
 
 
 var _off = function (routeString) {
-  var noArgs, routeObject, eventString, subRouteMap, rs;
+  // Throws
+  //   InvalidRouteStringError
+  var noArgs, i, routeObject, eventString, subRouteMap, rs;
 
   noArgs = (typeof routeString === 'undefined');
   if (noArgs) {
@@ -345,25 +411,39 @@ var _off = function (routeString) {
     return;
   }
 
-  if (this.routeMap.hasOwnProperty(routeString)) {
-    routeObject = this.routeMap[routeString];
-    delete this.routeMap[routeString];
-    delete this.eventMap[routeObject.eventString][routeString];
-    // TODO remove empty sub route map
-    return;
-  } // else
+  // Turn to array for more general code.
+  if (!isArray(routeString)) {
+    routeString = [routeString];
+  }
 
-  eventString = routeString;
-  if (this.eventMap.hasOwnProperty(eventString)) {
-    subRouteMap = this.eventMap[eventString];
-    for (rs in subRouteMap) {
-      if (subRouteMap.hasOwnProperty(rs)) {
-        delete this.routeMap[rs];
+  // Validate all routeStrings before mutating anything.
+  // This makes the off call more atomic.
+  for (i = 0; i < routeString.length; i += 1) {
+    if (typeof routeString[i] !== 'string') {
+      throw new InvalidRouteStringError(routeString[i]);
+    }
+  }
+
+  for (i = 0; i < routeString.length; i += 1) {
+    if (this.routeMap.hasOwnProperty(routeString[i])) {
+      routeObject = this.routeMap[routeString[i]];
+      delete this.routeMap[routeString[i]];
+      delete this.eventMap[routeObject.eventString][routeString[i]];
+      // TODO remove sub route map from the event map if it is empty
+    } else {
+      // As eventString
+      eventString = routeString[i];
+      if (this.eventMap.hasOwnProperty(eventString)) {
+        subRouteMap = this.eventMap[eventString];
+        for (rs in subRouteMap) {
+          if (subRouteMap.hasOwnProperty(rs)) {
+            delete this.routeMap[rs];
+          }
+        }
+        delete this.eventMap[eventString];
       }
     }
-    delete this.eventMap[eventString];
   }
-  return;
 /*
   // Unbind one or many handlers.
   //

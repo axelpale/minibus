@@ -21,11 +21,17 @@
       setTimeout(callback, 0)
     };
 
+    //*****************
+    // QUnit settings *
+    //*****************
+    // See also Gruntfile.qunit
+    QUnit.config.testTimeout = 10000;
+
     //******************************************************
     // Tests about how on, once emit and off work together *
     //******************************************************
 
-    asyncTest('on, emit, off, emit', function () {
+    QUnit.asyncTest('on, emit, off, emit', function (assert) {
       var bus = Minibus.create();
       var i = 0;
       var f = function () { i += 1; };
@@ -34,12 +40,12 @@
       bus.off('foo');
       bus.emit('foo');
       wait(function () {
-        ok(i === 1, 'Called f wrong number of times: ' + i);
-        start();
+        assert.ok(i === 1, 'Called f wrong number of times: ' + i);
+        QUnit.start();
       });
     });
 
-    asyncTest('on, off a route, emit', function () {
+    QUnit.asyncTest('on, off a route, emit', function (assert) {
       var bus = Minibus.create();
       var i = 0;
       var f = function () { i += 1; };
@@ -48,12 +54,12 @@
       bus.off(route);
       bus.emit('foo');
       wait(function () {
-        ok(i === 1, 'Called f wrong number of times: ' + i);
-        start();
+        assert.ok(i === 1, 'Called f wrong number of times: ' + i);
+        QUnit.start();
       });
     });
 
-    asyncTest('once, emit, emit', function () {
+    QUnit.asyncTest('once, emit, emit', function (assert) {
       var bus = Minibus.create();
       var i = 0;
       var f = function () { i += 1; };
@@ -61,12 +67,12 @@
       bus.emit('myevent'); // calls
       bus.emit('myevent'); // does not call
       wait(function () {
-        ok(i === 1, 'Called f wrong number of times: ' + i);
-        start();
+        assert.ok(i === 1, 'Called f wrong number of times: ' + i);
+        QUnit.start();
       });
     });
 
-    asyncTest('once, off, emit', function () {
+    QUnit.asyncTest('once, off, emit', function (assert) {
       var bus = Minibus.create();
       var i = 0;
       var f = function () { i += 1; };
@@ -74,34 +80,37 @@
       bus.off('foo');
       bus.emit('foo');
       wait(function () {
-        ok(i === 0, 'Called f wrong number of times: ' + i);
-        start();
+        assert.ok(i === 0, 'Called f wrong number of times: ' + i);
+        QUnit.start();
       });
     });
 
-    asyncTest('on, emit with args', function () {
+    QUnit.asyncTest('on, emit with args', function (assert) {
       var bus = Minibus.create();
       bus.on('myevent', function (foo, bar, baz) {
-        ok(baz === 'baz', 'Invalid argument: ' + baz);
-        start();
+        assert.ok(baz === 'baz', 'Invalid argument: ' + baz);
+        QUnit.start();
       });
       bus.emit('myevent', 'foo', 'bar', 'baz');
     });
 
-    asyncTest('once, emit with args', function () {
+    QUnit.asyncTest('once, emit with args', function (assert) {
       var bus = Minibus.create();
       bus.once('myevent', function (foo, bar, baz) {
-        ok(baz === 'baz', 'Invalid argument: ' + baz);
-        start();
+        assert.ok(baz === 'baz', 'Invalid argument: ' + baz);
+        QUnit.start();
       });
       bus.emit('myevent', 'foo', 'bar', 'baz');
     });
 
-    asyncTest('on with event string array, off', function () {
+    QUnit.asyncTest('on with event string array, off', function (assert) {
       var bus = Minibus.create();
       var i = 0;
       var f = function () { i += 1; };
       var route = bus.on(['foo', 'bar'], f);
+      
+      assert.ok(Array.isArray(route), 'Route is not an array: ' + route);
+
       bus.emit('foo'); // calls
       bus.emit('bar'); // calls
       bus.off('foo');
@@ -111,12 +120,12 @@
       bus.emit('foo'); // nothing happens
       bus.emit('bar'); // nothing happens
       wait(function () {
-        ok(i === 3, 'Called f wrong number of times: ' + i);
-        start();
+        assert.ok(i === 3, 'Called f wrong number of times: ' + i);
+        QUnit.start();
       });
     });
 
-    asyncTest('on 1, on 2, off without params', function () {
+    QUnit.asyncTest('on 1, on 2, off without params', function (assert) {
       var bus = Minibus.create();
       var i = 0;
       var f = function () { i += 1; };
@@ -127,12 +136,12 @@
       bus.emit('foo'); // nothing should happen
       bus.emit('bar'); // nothing should happen
       wait(function () {
-        ok(i === 1, 'Called f wrong number of times: ' + i);
-        start();
+        assert.ok(i === 1, 'Called f wrong number of times: ' + i);
+        QUnit.start();
       });
     });
 
-    asyncTest('how on and once work with off', function () {
+    QUnit.asyncTest('how on and once work with off', function (assert) {
       // on 1, once 1,
       // emit 1 -> both fire,
       // emit 1 -> one fires
@@ -144,12 +153,12 @@
       bus.emit('foo'); // calls f twice
       bus.emit('foo'); // calls f once
       wait(function () {
-        ok(i === 3, 'Called f wrong number of times: ' + i);
-        start();
+        assert.ok(i === 3, 'Called f wrong number of times: ' + i);
+        QUnit.start();
       });
     });
 
-    asyncTest('async off', function () {
+    QUnit.asyncTest('async off', function (assert) {
       // Defines what happens if async emit and then off.
       // A design decision: off needs to be async.
       var bus = Minibus.create();
@@ -160,8 +169,8 @@
       bus.off('foo'); // offSync stops both, not only the second.
       bus.emit('foo', f); // does not call
       wait(function () {
-        ok(i === 1, 'Called f wrong number of times: ' + i);
-        start();
+        assert.ok(i === 1, 'Called f wrong number of times: ' + i);
+        QUnit.start();
       });
     });
 
@@ -169,23 +178,23 @@
     // Emit related tests *
     //*********************
 
-    test('emit with no parameters', function () {
+    QUnit.test('emit with no parameters', function (assert) {
       var bus = Minibus.create();
-      throws(
+      assert.throws(
         function () { bus.emit(); },
         'Throws an error about invalid event string'
       );
     });
 
-    test('emit with invalid event string', function () {
+    QUnit.test('emit with invalid event string', function (assert) {
       var bus = Minibus.create();
-      throws(
+      assert.throws(
         function () { bus.emit(42); },
         'Throws an error about invalid event string'
       );
     });
 
-    asyncTest('ensure that emit is async', function () {
+    QUnit.asyncTest('ensure that emit is async', function (assert) {
       var bus = Minibus.create();
       var i = 0;
       var f = function () { i += 1; };
@@ -193,13 +202,12 @@
       bus.emit('foo');
       ok(i === 0);
       wait(function () {
-        ok(i === 1, 'Called f right number of times.');
-        start();
+        assert.ok(i === 1, 'Called f right number of times.');
+        QUnit.start();
       });
     });
 
-    asyncTest('ensure that recursion loop works', function () {
-      expect(0); // No assertions needed.
+    QUnit.asyncTest('ensure that recursion loop works', function (assert) {
       var bus = Minibus.create();
       var i = 0;
       var foo = function () {
@@ -211,45 +219,50 @@
           bus.emit('foo');
         } else {
           // Ensures that recursion ends.
-          start();
+          assert.ok(true, 'Recursion ended.')
+          QUnit.start();
         }
       };
       bus.on('foo', foo);
       bus.on('bar', bar);
       bus.emit('foo');
     });
-/*
 
     //*******************
     // On related tests *
     //*******************
 
-    test('on with invalid event string', function () {
+    QUnit.test('on with an empty event string array', function (assert) {
+      // should work but do nothing.
       var bus = Minibus.create();
       var i = 0;
       var f = function () { i += 1; };
-      throws(
-        function () { bus.on([], f); },
-        'Throws an error about invalid event string'
-      );
-      throws(
+      bus.on([], f);
+      assert.ok(i === 0, 'Called f function too many times.');
+    });
+
+    QUnit.test('on with invalid event string', function (assert) {
+      var bus = Minibus.create();
+      var i = 0;
+      var f = function () { i += 1; };
+      assert.throws(
         function () { bus.on(['foo', 42], f); },
         'Throws an error about invalid event string'
       );
-      throws(
+      assert.throws(
         function () { bus.on(42, f); },
         'Throws an error about invalid event string'
       );
-      ok(i === 0, 'f is not called');
+      assert.ok(i === 0, 'f is not called');
     });
 
-    test('on with invalid handler function', function () {
+    QUnit.test('on with invalid handler function', function (assert) {
       var bus = Minibus.create();
-      throws(
+      assert.throws(
         function () { bus.on('foo'); },
         'Throws an error about invalid event handler function'
       );
-      throws(
+      assert.throws(
         function () { bus.on('foo', {}); },
         'Throws an error about invalid event handler function'
       );
@@ -259,32 +272,37 @@
     // Once related tests *
     //*********************
 
-    test('once with invalid event string', function () {
+    QUnit.test('once with an empty event string array', function (assert) {
+      // should work but do nothing.
       var bus = Minibus.create();
       var i = 0;
       var f = function () { i += 1; };
-      throws(
-        function () { bus.once([], f); },
-        'Throws an error about invalid event string'
-      );
-      throws(
+      bus.once([], f);
+      assert.ok(i === 0, 'Called f function too many times.');
+    });
+
+    QUnit.test('once with invalid event string', function (assert) {
+      var bus = Minibus.create();
+      var i = 0;
+      var f = function () { i += 1; };
+      assert.throws(
         function () { bus.once(['foo', 42], f); },
         'Throws an error about invalid event string'
       );
-      throws(
+      assert.throws(
         function () { bus.once(42, f); },
         'Throws an error about invalid event string'
       );
-      ok(i === 0, 'f is not called');
+      assert.ok(i === 0, 'f is not called');
     });
 
-    test('once with invalid handler function', function () {
+    QUnit.test('once with invalid handler function', function (assert) {
       var bus = Minibus.create();
-      throws(
+      assert.throws(
         function () { bus.once('foo'); },
         'Throws an error about invalid event handler function'
       );
-      throws(
+      assert.throws(
         function () { bus.once('foo', {}); },
         'Throws an error about invalid event handler function'
       );
@@ -294,28 +312,28 @@
     // Off related tests *
     //********************
 
-    asyncTest('off with an unknown route string', function () {
+    QUnit.asyncTest('off with an unknown route string', function (assert) {
+      assert.expect(0);
       var bus = Minibus.create();
       bus.off('foo'); // no error
       wait(function () {
-        start();
+        QUnit.start();
       });
     });
 
-    test('off with invalid route string', function () {
+    QUnit.test('off with invalid route string', function (assert) {
       var bus = Minibus.create();
-      throws(
+      assert.throws(
         function () { bus.off(42); },
         'Throws an error about invalid route string.'
       )
     });
-*/
 
     //*******************************
     // Aliases for emit, on and off *
     //*******************************
 
-    asyncTest('alternative function names', function () {
+    QUnit.asyncTest('alternative function names', function (assert) {
       var bus = Minibus.create();
       var i = 0;
       var f = function () { i += 1; };
@@ -324,8 +342,8 @@
       bus.removeListener('foo');
       bus.trigger('foo');
       wait(function () {
-        ok(i === 1, 'Called f right number of times.');
-        start();
+        assert.ok(i === 1, 'Called f right number of times.');
+        QUnit.start();
       }); // handler may not be called immediately.
     });
 
@@ -333,9 +351,9 @@
     // Version related tests *
     //************************
 
-    test('version', function () {
+    QUnit.test('version', function (assert) {
       var versRegExp = /^\d+\.\d+\.\d+$/;
-      ok(versRegExp.test(Minibus.version),
+      assert.ok(versRegExp.test(Minibus.version),
          'Incorrect version format: ' + Minibus.version);
     });
 
@@ -343,12 +361,12 @@
     // Extension related tests *
     //**************************
 
-    test('extension', function testCase() {
+    QUnit.test('extension', function (assert) {
       var bus = Minibus.create();
       Minibus.extension.myFunction = function () {
         return 'foo';
       };
-      strictEqual(bus.myFunction(), 'foo', 'Function is callable.');
+      assert.strictEqual(bus.myFunction(), 'foo', 'Function is callable.');
     });
 
   </script>
