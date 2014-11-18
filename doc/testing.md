@@ -1,9 +1,17 @@
-Meta
-  Update date
-    2014-01-05
+# Testing Minibus
 
+## Unit tests
 
-Resources about testing
+  $ grunt test
+
+Find the unit tests in test/ directory.
+
+## Manual testing environment
+
+Open test/manual-testing.html with your browser with a console.
+
+##  Resources about testing
+
   Grunt QUnit
     https://github.com/gruntjs/grunt-contrib-qunit
 
