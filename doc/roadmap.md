@@ -22,9 +22,6 @@ In 2.x.x the route object returned by "on" is a object having properties like th
 
 To encapsulate the inner workings of Minibus more securely, route object should contain only the identity of the route. Natural choice would be an unique string.
 
-Sync and async calls
---------------------
-Separate sync and async calls. Async calls place the execution of the handler functions on back of the JS's event queue. Sync calls execute the handlers immediately in sequence so that when "emit" finishes the handlers are already executed.
 
 
 Features in 4.0.0
@@ -33,3 +30,7 @@ Features in 4.0.0
 Busify any object
 -----------------
 Method "extend" that takes in an object and turns it into a minibus instance. The handlers are executed in the context of the object.
+
+Sync and async calls
+--------------------
+Separate sync and async calls. Async calls place the execution of the handler functions on back of the JS's event queue. Sync calls execute the handlers immediately in sequence so that when "emit" finishes the handlers are already executed. Debatable decision.
