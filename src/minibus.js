@@ -62,45 +62,6 @@ var InvalidEventHandlerError = function (eventHandler) {
 
 
 var _emit = function (eventString) {
-  // Throws
-  //   InvalidEventStringError
-  //     if given event string is not a string e.g. undefined
-  var emitArgs, i, subRouteMap, routeString, eventHandlers, busContext;
-
-  if (typeof eventString !== 'string') {
-    throw new InvalidEventStringError(eventString);
-  }
-
-  if (!this.eventMap.hasOwnProperty(eventString)) {
-    return;
-  } // else
-
-  // Collect passed arguments. Drop the eventString argument.
-  emitArgs = [];
-  for (i = 1; i < arguments.length; i += 1) {
-    emitArgs.push(arguments[i]);
-  }
-
-  // Collect handlers synchronously to prevent additional
-  // handlers becoming executed if those become added between
-  // emit call and setTimeout.
-  eventHandlers = [];
-  subRouteMap = this.eventMap[eventString];
-  for (routeString in subRouteMap) {
-    if (subRouteMap.hasOwnProperty(routeString)) {
-      eventHandlers.push(subRouteMap[routeString].eventHandler);
-    }
-  }
-
-  // All event handlers on the bus share a same bus context.
-  busContext = this.busContext;
-  setTimeout(function () {
-    for (var i = 0; i < eventHandlers.length; i += 1) {
-      eventHandlers[i].apply(busContext, emitArgs);
-    }
-  }, 0);
-
-/*
   // Emit an event to fire the bound handlers.
   // The handlers are executed immediately.
   //
@@ -109,14 +70,58 @@ var _emit = function (eventString) {
   //     Event key
   //   arg1 (optional)
   //     Argument to be passed to the handler functions.
-  //     If type of arg1 is an object then it will be used
-  //     as this-context for the functions.
   //   arg2 (optional)
   //   ...
   //
   // Return
-  //   this
-  //     For chaining.
+  //   nothing
+  //
+  // Throws
+  //   InvalidEventStringError
+  //     if given event string is not a string or array of strings.
+  //
+  var emitArgs, i, subRouteMap, routeString, eventHandlers, busContext;
+
+  // Turn to array for more general code.
+  if (!isArray(eventString)) {
+    eventString = [eventString];
+  }
+
+  // Validate all eventStrings before mutating anything.
+  // This makes the on call more atomic.
+  for (i = 0; i < eventString.length; i += 1) {
+    if (typeof eventString[i] !== 'string') {
+      throw new InvalidEventStringError(eventString[i]);
+    }
+  }
+
+  // Collect passed arguments after the eventString argument.
+  emitArgs = [];
+  for (i = 1; i < arguments.length; i += 1) {
+    emitArgs.push(arguments[i]);
+  }
+
+  // Collect all the event handlers bound to the given eventString
+  eventHandlers = [];
+  for (i = 0; i < eventString.length; i += 1) {
+    if (this.eventMap.hasOwnProperty(eventString[i])) {
+      subRouteMap = this.eventMap[eventString[i]];
+      for (routeString in subRouteMap) {
+        if (subRouteMap.hasOwnProperty(routeString)) {
+          eventHandlers.push(subRouteMap[routeString].eventHandler);
+        }
+      }
+    }
+  }
+
+  // Apply the event handlers.
+  // All event handlers on the bus share a same bus context.
+  busContext = this.busContext;
+  for (i = 0; i < eventHandlers.length; i += 1) {
+    eventHandlers[i].apply(busContext, emitArgs);
+  }
+
+/*
   var emitArgs, i, route, routes, context;
 
   if (this.keyRoutes.hasOwnProperty(key)) {

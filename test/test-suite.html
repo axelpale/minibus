@@ -12,6 +12,14 @@
   <script src="../minibus.js"></script>
   <script type="text/javascript">
 
+    //***********************
+    // About this unit test *
+    //***********************
+    // Most of the tests are compatible both for synchronous and asynchronous
+    // version of emit. Event though the current implementation of emit is
+    // synchronous, it can change in the future.
+    // There is a dedicated section for synchronicity tests.
+
     //****************
     // Testing tools *
     //****************
@@ -158,22 +166,6 @@
       });
     });
 
-    QUnit.asyncTest('async off', function (assert) {
-      // Defines what happens if async emit and then off.
-      // A design decision: off needs to be async.
-      var bus = Minibus.create();
-      var i = 0;
-      var f = function () { i += 1; };
-      bus.on('foo', f);
-      bus.emit('foo', f); // calls
-      bus.off('foo'); // offSync stops both, not only the second.
-      bus.emit('foo', f); // does not call
-      wait(function () {
-        assert.ok(i === 1, 'Called f wrong number of times: ' + i);
-        QUnit.start();
-      });
-    });
-
     QUnit.asyncTest('multiple ons with same event string ' +
                     'and handler function', function (assert) {
       var bus = Minibus.create();
@@ -255,46 +247,72 @@
       );
     });
 
-    QUnit.test('emit with event string array', function (assert) {
+    QUnit.asyncTest('emit with event string array', function (assert) {
       var bus = Minibus.create();
-      assert.throws(
-        function () { bus.emit(['foo', 'bar']); },
-        'Throws an error about invalid event string'
-      );
+      var i = 0;
+      var f = function () { i += 1; };
+      bus.on('foo', f);
+      bus.emit(['foo', 'foo']);
+      wait(function () {
+        assert.ok(i === 2, 'Called f right number of times.');
+        QUnit.start();
+      });
     });
 
-    QUnit.asyncTest('ensure that emit is async', function (assert) {
+    //************************************
+    // Synchronicity of emit related tests *
+    //************************************
+
+    QUnit.asyncTest('async off', function (assert) {
+      // Defines what happens if sync emit and then off.
+      var bus = Minibus.create();
+      var i = 0;
+      var f = function () { i += 1; };
+      bus.on('foo', f);
+      bus.emit('foo', f); // calls
+      bus.off('foo'); // offSync stops both, not only the second.
+      bus.emit('foo', f); // does not call
+      wait(function () {
+        assert.ok(i === 1, 'Called f wrong number of times: ' + i);
+        QUnit.start();
+      });
+    });
+
+    QUnit.asyncTest('ensure that emit is sync', function (assert) {
       var bus = Minibus.create();
       var i = 0;
       var f = function () { i += 1; };
       bus.on('foo', f);
       bus.emit('foo');
-      ok(i === 0);
+      assert.ok(i === 1, 'Called f right number of times.');
       wait(function () {
         assert.ok(i === 1, 'Called f right number of times.');
         QUnit.start();
       });
     });
 
-    QUnit.asyncTest('ensure that recursion loop works', function (assert) {
-      var bus = Minibus.create();
-      var i = 0;
-      var foo = function () {
-        bus.emit('bar'); // If sync, next line would never be called.
-        i += 1;
-      };
-      var bar = function () {
-        if (i < 10) {
-          bus.emit('foo');
-        } else {
-          // Ensures that recursion ends.
-          assert.ok(true, 'Recursion ended.')
-          QUnit.start();
-        }
-      };
-      bus.on('foo', foo);
-      bus.on('bar', bar);
-      bus.emit('foo');
+    QUnit.asyncTest('ensure that recursion loop fails', function (assert) {
+      throws(function () {
+        var bus = Minibus.create();
+        var i = 0;
+        var foo = function () {
+          bus.emit('bar'); // If sync, next line would never be called.
+          i += 1;
+        };
+        var bar = function () {
+          if (i < 1000) {
+            bus.emit('foo');
+          } else {
+            // Ensures that recursion ends.
+            assert.ok(true, 'Recursion ended.')
+            QUnit.start();
+          }
+        };
+        bus.on('foo', foo);
+        bus.on('bar', bar);
+        bus.emit('foo');
+      }, 'Recursion loop did not fail and did not throw an error.');
+      QUnit.start();
     });
 
     //*******************
