@@ -31,6 +31,10 @@ Busify any object
 -----------------
 Method "extend" that takes in an object and turns it into a minibus instance. The handlers are executed in the context of the object.
 
+Hide state variables behind bus.state
+-------------------------------------
+Or hide some other way. One way the state variables to be completely hidden but might prevent use by extension.
+
 Sync and async calls
 --------------------
 Separate sync and async calls. Async calls place the execution of the handler functions on back of the JS's event queue. Sync calls execute the handlers immediately in sequence so that when "emit" finishes the handlers are already executed. Debatable decision.
