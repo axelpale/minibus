@@ -1,4 +1,4 @@
-# minibus.js<sup>v2.4.0</sup>
+# minibus.js<sup>v3.0.0</sup>
 
 Minimal event bus a.k.a. message dispatcher for JavaScript.
 
@@ -95,7 +95,7 @@ Throws `InvalidEventStringError` if given event string is not a string or an arr
 
 ### bus.on
 
-*alias bus.listen*
+*alias bus.**listen***
 
 On an event string being emitted, execute an event handler function. Returns a route that can be used with `off` to cancel this binding.
 
@@ -130,7 +130,7 @@ Bind once. Just like `bus.on` but the event handler function can be executed onl
 
 ### bus.off
 
-alias bus.removeListener
+*alias bus.**removeListener***
 
 Unbind one or many event handlers. Returns nothing. With no parameters, unbinds all the event handlers for all the event strings.
 
@@ -155,7 +155,7 @@ Throws `InvalidRouteStringError` if given route is not a string or array of stri
 
 ## Customize Minibus
 
-Customize buses by:
+Customize `bus` by:
 
     Minibus.extension.myFunction = function (...) {...};
 

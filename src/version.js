@@ -1,2 +1,2 @@
   // Version
-  exports.version = '2.4.0';
+  exports.version = '3.0.0';
