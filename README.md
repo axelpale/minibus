@@ -57,7 +57,7 @@ Minimal event bus a.k.a. message dispatcher for JavaScript.
 
 ### Minibus.create
 
-Create a new bus. Takes no parameters.
+Create a new `bus`. Takes no parameters.
 
     >> var bus = Minibus.create()
     >> bus.on('hello', function () { ...
@@ -66,7 +66,7 @@ Create a new bus. Takes no parameters.
 
 ### bus.emit
 
-__alias bus.**trigger**__
+*alias bus.**trigger***
 
 Emit an event to execute the event handlers. The event handlers are executed immediately. Takes in an event string. Returns nothing.
 
@@ -89,15 +89,15 @@ Another example:
     >> bus.emit('flat-tire', 'front', 'right');
     The front right tire blew out.
 
-Throws ´InvalidEventStringError´ if given event string is not a string or an array of strings.
+Throws `InvalidEventStringError` if given event string is not a string or an array of strings.
 
 
 
 ### bus.on
 
-alias bus.listen
+*alias bus.listen*
 
-On an event string being emitted, execute an event handler function. Returns a route that can be used with ´off´ to cancel this binding.
+On an event string being emitted, execute an event handler function. Returns a route that can be used with `off` to cancel this binding.
 
     >> var route = bus.on('out-of-fuel', function () {
          console.log('Hitchhike.')
@@ -110,13 +110,13 @@ Takes in an event string or an array of event strings and an event handler funct
          console.log('Call home.')
        })
 
-Throws ´InvalidEventStringError´ if given event string is not a string or array of strings. Throws ´InvalidEventHandlerError´if given event handler is not a function.
+Throws `InvalidEventStringError` if given event string is not a string or array of strings. Throws `InvalidEventHandlerError` if given event handler is not a function.
 
 
 
 ### bus.once
 
-Bind once. Just like ´bus.on´ but the event handler function can be executed only once and is then forgotten.
+Bind once. Just like `bus.on` but the event handler function can be executed only once and is then forgotten.
 
     >> bus.once('out-of-fuel', function () {
          console.log('Smoke your last cigarette.')
@@ -136,7 +136,7 @@ Unbind one or many event handlers. Returns nothing. With no parameters, unbinds 
 
     >> bus.off()
 
-Takes in a route an array of routes returned by an ´on´ or ´once´.
+Takes in a route an array of routes returned by an `on` or `once`.
 
     >> var route = bus.on('out-of-fuel', function () {
          console.log('Hitchhike.')
@@ -149,7 +149,7 @@ Alternatively takes in an array of routes.
 
     >> bus.off([route, otherRoute])
 
-Throws ´InvalidRouteStringError´ if given route is not a string or array of strings.
+Throws `InvalidRouteStringError` if given route is not a string or array of strings.
 
 
 
@@ -168,8 +168,8 @@ After that you can:
 
 ## Repository branches
 
-- 'master' is for production-ready releases.
-- 'develop' is for feature development
+- `master` is for production-ready releases.
+- `develop` is for feature development
 
 This convention follows a [successful git branching model](http://nvie.com/posts/a-successful-git-branching-model/).
 
