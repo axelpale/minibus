@@ -1,6 +1,6 @@
 # minibus.js<sup>v2.4.0</sup>
 
-Minimal Message Dispatcher for JavaScript.
+Minimal event bus a.k.a. message dispatcher for JavaScript.
 
 ![minibus.js](../master/doc/img/minibus.png?raw=true)
 
