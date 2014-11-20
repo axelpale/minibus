@@ -1,7 +1,7 @@
 /*
  * Gruntfile for Minibus.js
  *
- * Copyright (c) 2013 Akseli Palen
+ * Copyright (c) 2014 Akseli Palen
  * Licensed under the MIT license.
  *
  * Installation
@@ -11,11 +11,11 @@
 
 module.exports = function(grunt) {
   'use strict';
-  
+
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    
+
     // Meta options for conveniency
     meta: {
       banner: '\
@@ -25,7 +25,7 @@ module.exports = function(grunt) {
  * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %> <<%= pkg.author.email %>>;\n\
  * Licensed under the <%= pkg.license.type %> license */\n\n'
     },
-    
+
     // Merge source files
     concat: {
       options: {
@@ -45,7 +45,7 @@ module.exports = function(grunt) {
         dest: '<%= pkg.name %>.js'
       }
     },
-    
+
     // Minify the source code
     uglify: {
       options: {
@@ -61,7 +61,7 @@ module.exports = function(grunt) {
         }
       }
     },
-    
+
     // Check for optimisations and errors
     // http://www.jshint.com/docs/options/
     jshint: {
@@ -85,19 +85,19 @@ module.exports = function(grunt) {
         //unused: true, // warn about unused variables
         strict: true,
         trailing: true,
-        
+
         // Relaxing options, supresses warnings
         //asi: true, missing semicolons
         //boss: true, assignments in weird places
         //eqnull: true,
         //evil: true,
         //expr: true, // expressions in weird places
-        
+
         // Environment options
         browser: true,
         jquery: true,
         node: true,
-        
+
         globals: {
           '_': false, // any effect being true or false?
           define: false // ?
@@ -107,7 +107,7 @@ module.exports = function(grunt) {
         src: ['<%= pkg.name %>.js']
       }
     },
-    
+
     // Update version in the sources
     replace: {
       dist: {
@@ -145,18 +145,18 @@ module.exports = function(grunt) {
         ]
       }
     },
-    
+
     qunit: {
       dist: {
         options: {
+          timeout: 3000,
           urls: [
-            'http://localhost:8000/test/basic-usage.html',
-            'http://localhost:8000/test/invalid-arguments.html'
+            'http://localhost:8000/test/test-suite.html'
           ]
         },
       }
     },
-    
+
     // Start server for QUnit tests.
     connect: {
       server: {
@@ -167,7 +167,7 @@ module.exports = function(grunt) {
       }
     }
   });
-  
+
   // Load tasks
   grunt.loadNpmTasks('grunt-contrib-concat'); // For merging files together
   grunt.loadNpmTasks('grunt-contrib-uglify'); // For minifying
@@ -175,12 +175,12 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-qunit'); // For functional testing
   grunt.loadNpmTasks('grunt-contrib-connect'); // For functional test server
   grunt.loadNpmTasks('grunt-replace'); // For adding versions
-  
+
   // Default task(s).
   grunt.registerTask('default', ['build']);
   grunt.registerTask('build', ['replace', 'concat', 'uglify', 'test']);
   grunt.registerTask('test', ['test:syntax', 'test:function']);
   grunt.registerTask('test:syntax', ['jshint']);
   grunt.registerTask('test:function', ['connect', 'qunit']);
-  
+
 };
