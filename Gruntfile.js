@@ -1,7 +1,7 @@
 /*
  * Gruntfile for Minibus.js
  *
- * Copyright (c) 2013 Akseli Palen
+ * Copyright (c) 2014 Akseli Palen
  * Licensed under the MIT license.
  *
  * Installation
