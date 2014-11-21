@@ -181,6 +181,25 @@
       });
     });
 
+    QUnit.asyncTest('eventString and routeString name conflict',
+                    function (assert) {
+      var bus = Minibus.create();
+      var i = 0;
+      var j = 0;
+      var f = function () { i += 1; };
+      var g = function () { j += 1; };
+      var route = bus.on('foo', f);
+      // route string can be '18'
+      bus.on('18', g);
+      bus.off('18');
+      bus.emit(['foo', '18']); // should fire f -> increase i
+      wait(function () {
+        assert.strictEqual(i, 1, 'Called f wrong number of times: ' + i);
+        assert.strictEqual(j, 0, 'Called g wrong number of times: ' + j);
+        QUnit.start();
+      });
+    });
+
     //******************
     // Context related *
     //******************
@@ -254,7 +273,7 @@
       bus.on('foo', f);
       bus.emit(['foo', 'foo']);
       wait(function () {
-        assert.ok(i === 2, 'Called f right number of times.');
+        assert.ok(i === 2, 'Called f wrong number of times: ' + i);
         QUnit.start();
       });
     });
@@ -284,9 +303,9 @@
       var f = function () { i += 1; };
       bus.on('foo', f);
       bus.emit('foo');
-      assert.ok(i === 1, 'Called f right number of times.');
+      assert.ok(i === 1, 'Called f wrong number of times: ' + i);
       wait(function () {
-        assert.ok(i === 1, 'Called f right number of times.');
+        assert.ok(i === 1, 'Called f wrong number of times: ' + i);
         QUnit.start();
       });
     });
@@ -325,7 +344,7 @@
       var i = 0;
       var f = function () { i += 1; };
       bus.on([], f);
-      assert.ok(i === 0, 'Called f function too many times.');
+      assert.ok(i === 0, 'Called f wrong number of times: ' + i);
     });
 
     QUnit.test('on with invalid event string', function (assert) {
@@ -426,6 +445,20 @@
       )
     });
 
+    QUnit.asyncTest('off with array of routes that can be arrays', function (assert) {
+      var bus = Minibus.create();
+      var i = 0;
+      var f = function () { i += 1; };
+      var r1 = bus.on(['foo', 'bar'], f);
+      var r2 = bus.on('baz', f);
+      bus.off([r1, r2]); // would throw an error if does not work.
+      bus.emit(['foo', 'bar', 'baz']);
+      wait(function () {
+        assert.ok(i === 0, 'Called f wrong number of times: ' + i);
+        QUnit.start();
+      });
+    });
+
     //*******************************
     // Aliases for emit, on and off *
     //*******************************
@@ -439,7 +472,7 @@
       bus.removeListener('foo');
       bus.trigger('foo');
       wait(function () {
-        assert.ok(i === 1, 'Called f right number of times.');
+        assert.ok(i === 1, 'Called f wrong number of times: ' + i);
         QUnit.start();
       }); // handler may not be called immediately.
     });
