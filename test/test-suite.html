@@ -32,8 +32,7 @@
     //*****************
     // QUnit settings *
     //*****************
-    // See also Gruntfile.qunit
-    //QUnit.config.testTimeout = 3000;
+    // See Gruntfile.qunit
 
     //******************************************************
     // Tests about how on, once emit and off work together *
@@ -339,12 +338,19 @@
     //*******************
 
     QUnit.test('on with an empty event string array', function (assert) {
-      // should work but do nothing.
       var bus = Minibus.create();
       var i = 0;
       var f = function () { i += 1; };
-      bus.on([], f);
+      var route = bus.on([], f);
+      bus.off(route);
       assert.ok(i === 0, 'Called f wrong number of times: ' + i);
+    });
+
+    QUnit.test('on without arguments', function (assert) {
+      var bus = Minibus.create();
+      throws(function () {
+        var route = bus.on();
+      }, 'Does not throw error even though no arguments to on.');
     });
 
     QUnit.test('on with invalid event string', function (assert) {

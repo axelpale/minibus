@@ -1,9 +1,4 @@
 // Minibus
-//
-// Known Issues
-//   on() without parameters creates empty route which produce errors emit()
-
-
 
 //**************
 // Constructor *
