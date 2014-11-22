@@ -1,33 +1,20 @@
 var Identity = (function () {
   // A utility for creating unique strings for identification.
-  // 
-  // Usage
+  // Abstracts how uniqueness is archieved.
+  //
+  // Usages
   //   >>> Identity.create();
-  //   '1'
+  //   '532402059994638'
   //   >>> Identity.create();
-  //   '2'
-  // 
+  //   '544258285779506'
+  //
   var exports = {};
   /////////////////
-  
-  
-  // State
-  var counter = 0;
-  
-  
-  // Constructor
-  
-  var Id = function () {
-    this.counter = 0;
-  };
-  
+
   exports.create = function () {
-    counter += 1;
-    return counter.toString();
+    return Math.random().toString().substring(2);
   };
-  
-  
-  
+
   ///////////////
   return exports;
 }());

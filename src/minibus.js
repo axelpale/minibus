@@ -1,9 +1,4 @@
 // Minibus
-//
-// Known Issues
-//   on() without parameters creates empty route which produce errors emit()
-
-
 
 //**************
 // Constructor *
@@ -284,12 +279,14 @@ var _off = function (routeString) {
   //
   // Parameter
   //   routeString
-  //     A route string or array of route strings.
+  //     A route string or an array of route strings or
+  //     an array of arrays of route strings.
   //     The route to be shut down.
   //
   // Parameter (Alternative)
   //   eventString
-  //     An event string or array of event strings.
+  //     An event string or an array of event strings or
+  //     an array of arrays of event strings.
   //     Shut down all the routes with this event string.
   //
   // Parameter (Alternative)
@@ -315,6 +312,16 @@ var _off = function (routeString) {
   if (!isArray(routeString)) {
     routeString = [routeString];
   }
+
+  // Flatten arrays to allow arrays of arrays of route strings.
+  // This is needed if user wants to off an array of routes. Some routes
+  // might be arrays or route strings because 'on' interface.
+  // http://stackoverflow.com/a/10865042/638546
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/
+  //   Reference/Global_Objects/Array/concat
+  var flat = [];
+  flat = flat.concat.apply(flat, routeString);
+  routeString = flat;
 
   // Validate all routeStrings before mutating anything.
   // This makes the off call more atomic.

@@ -1,4 +1,4 @@
-/*! minibus - v3.0.0 - 2014-11-20
+/*! minibus - v3.1.0 - 2014-11-22
  * https://github.com/axelpale/minibus
  *
  * Copyright (c) 2014 Akseli Palen <akseli.palen@gmail.com>;
@@ -22,11 +22,6 @@
   'use strict';
 
 // Minibus
-//
-// Known Issues
-//   on() without parameters creates empty route which produce errors emit()
-
-
 
 //**************
 // Constructor *
@@ -307,12 +302,14 @@ var _off = function (routeString) {
   //
   // Parameter
   //   routeString
-  //     A route string or array of route strings.
+  //     A route string or an array of route strings or
+  //     an array of arrays of route strings.
   //     The route to be shut down.
   //
   // Parameter (Alternative)
   //   eventString
-  //     An event string or array of event strings.
+  //     An event string or an array of event strings or
+  //     an array of arrays of event strings.
   //     Shut down all the routes with this event string.
   //
   // Parameter (Alternative)
@@ -338,6 +335,16 @@ var _off = function (routeString) {
   if (!isArray(routeString)) {
     routeString = [routeString];
   }
+
+  // Flatten arrays to allow arrays of arrays of route strings.
+  // This is needed if user wants to off an array of routes. Some routes
+  // might be arrays or route strings because 'on' interface.
+  // http://stackoverflow.com/a/10865042/638546
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/
+  //   Reference/Global_Objects/Array/concat
+  var flat = [];
+  flat = flat.concat.apply(flat, routeString);
+  routeString = flat;
 
   // Validate all routeStrings before mutating anything.
   // This makes the off call more atomic.
@@ -387,41 +394,28 @@ Bus.prototype.removeListener = _off;
 
 var Identity = (function () {
   // A utility for creating unique strings for identification.
-  // 
-  // Usage
+  // Abstracts how uniqueness is archieved.
+  //
+  // Usages
   //   >>> Identity.create();
-  //   '1'
+  //   '532402059994638'
   //   >>> Identity.create();
-  //   '2'
-  // 
+  //   '544258285779506'
+  //
   var exports = {};
   /////////////////
-  
-  
-  // State
-  var counter = 0;
-  
-  
-  // Constructor
-  
-  var Id = function () {
-    this.counter = 0;
-  };
-  
+
   exports.create = function () {
-    counter += 1;
-    return counter.toString();
+    return Math.random().toString().substring(2);
   };
-  
-  
-  
+
   ///////////////
   return exports;
 }());
 
 
   // Version
-  exports.version = '3.0.0';
+  exports.version = '3.1.0';
 
 
 // End of intro
