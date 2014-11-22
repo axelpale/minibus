@@ -12,16 +12,17 @@ Possible disadvantage of this is grown possibility for the programming error tha
 
 Simple way to bind multiple events to same handler
 ------------------------------------------------------
-In 2.x.x "on" method accepted only one event to be bind per one call. The method should accept a set of events.
+In 2.x.x "on" method accepted only one event to be bind per one call. The method should accept an array of events.
 
 Without this feature it is impossible to bind multiple events to an anonymous function.
+
+For consistency, emit, on, once and off should all take arrays of events or routes.
 
 Route is just a string
 ----------------------
 In 2.x.x the route object returned by "on" is a object having properties like the event key, the handler function, route id and such. This allows the user to modify the route freely but on the other hand gives lot of room for an error. For example resetting the handler to a string may cause weird behaviour.
 
 To encapsulate the inner workings of Minibus more securely, route object should contain only the identity of the route. Natural choice would be an unique string.
-
 
 
 Features in 4.0.0

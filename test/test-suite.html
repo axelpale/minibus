@@ -459,6 +459,18 @@
       });
     });
 
+    QUnit.asyncTest('off with too many nested arrays', function (assert) {
+      var bus = Minibus.create();
+      var i = 0;
+      var f = function () { i += 1; };
+      var r1 = bus.on(['foo', 'bar'], f);
+      var r2 = bus.on('baz', f);
+      throws(function () {
+        bus.off([[r1], r2]); // would throw an error if does not work.
+      }, 'No error even though too many nested arrays.');
+      QUnit.start();
+    });
+
     //*******************************
     // Aliases for emit, on and off *
     //*******************************
