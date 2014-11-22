@@ -1,4 +1,4 @@
-# minibus.js<sup>v3.0.0</sup>
+# minibus.js<sup>v3.1.0</sup>
 
 Minimal event bus a.k.a. message dispatcher for JavaScript.
 
