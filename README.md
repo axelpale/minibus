@@ -1,8 +1,10 @@
 # minibus.js<sup>v3.1.0</sup>
 
-Minimal event bus a.k.a. message dispatcher for JavaScript.
-
 ![minibus.js](../master/doc/img/minibus.png?raw=true)
+
+Minibus is a minimal event bus for JavaScript.
+
+Using an event bus simplifies the structure of your code by letting the code communicate via events instead of direct function calls. If a piece of code tells what happens instead of what should be done next, it is much easier to hook new functionality to the piece of code without actually modifying it.
 
 
 
@@ -53,6 +55,72 @@ Minimal event bus a.k.a. message dispatcher for JavaScript.
 
 
 
+## Simplifying the structure of your code
+
+Let's take an example how an event bus could help you to simplify your code and make it more extendable. Let's say you have this little chat application having view and main modules. Main is responsible of loading messages from the server and the job of view is to displays them.
+
+    // view.js
+    var View = function () {
+      this.appendMessage = function (message) {
+        $('ul#messages').append('<li>' + message + '</li>');
+      };
+    };
+
+    // main.js
+    var view = new View();
+    loadMessageAndThen(function success(message) {
+      view.appendMessage(message);
+    });
+
+A couple of years pass and the application needs a new feature: it should play a sound when a new message is loaded. A function `playSound` is given to you premade. The question is how to integrate it into the old code?
+
+You could play dirty and put `playSound` call into `appendMessage` before adding `<li>` element. Okay, it might work at first but you or your co-worker will hate former you when `appendMessage` needs to be modified next year.
+
+You could add `playSound` directly into `success` callback after the `appendMessage` call. Okay, it's somewhat better but still this, and the previous approach as well, requires you to modify the old code. As you probably know, modified old code is a great source of strange errors, especially when done after a couple of years.
+
+So none of the approaches were optimal. How to have the new functionality without putting it close to an unrelated piece of code or stabbing and probably breaking the old code?
+
+Let's go back in time and implement the original code with an event bus:
+
+    // view.js
+    var initView = function (bus) {
+      bus.on('newMessage', function appendMessage(message) {
+        $('ul#messages').append('<li>' + message + '</li>');
+      });
+    };
+
+    // main.js
+    var bus = Minibus.create();
+    initView(bus);
+    loadMessageAndThen(function success(message) {
+      bus.emit('newMessage', message);
+    });
+
+Nothing much changed or did it? Now the view listens to `newMessage` events and main emits those. One important change is that `success` would work even if view did not exist and therefore view and main are now called loosely coupled instead of tightly coupled.
+
+Let a couple of years pass and `playSound` function to be included. Due to our event bus we can now do it without the downsides. All we need is to add an additional handler for the `newMessage` event:
+
+    // view.js
+    var initView = function (bus) {
+      bus.on('newMessage', function appendMessage(message) {
+        $('ul#messages').append('<li>' + message + '</li>');
+      });
+      bus.on('newMessage', function () {
+        playSound();
+      });
+    };
+
+    // main.js
+    var bus = Minibus.create();
+    initView(bus);
+    loadMessageAndThen(function success(message) {
+      bus.emit('newMessage', message);
+    });
+
+Nice and simple, huh? No need to mix the new functionality with irrelevant code or modify the old. All we need is to share the event bus with the parts of the program emitting to or listening it.
+
+
+
 ## API
 
 ### Minibus.create
@@ -66,7 +134,7 @@ Create a new `bus`. Takes no parameters.
 
 ### bus.emit
 
-*alias bus.**trigger***
+*alias bus.__trigger__*
 
 Emit an event to execute the event handlers. The event handlers are executed immediately. Takes in an event string. Returns nothing.
 
@@ -95,7 +163,7 @@ Throws `InvalidEventStringError` if given event string is not a string or an arr
 
 ### bus.on
 
-*alias bus.**listen***
+*alias bus.__listen__*
 
 On an event string being emitted, execute an event handler function. Returns a route that can be used with `off` to cancel this binding.
 
@@ -130,13 +198,13 @@ Bind once. Just like `bus.on` but the event handler function can be executed onl
 
 ### bus.off
 
-*alias bus.**removeListener***
+*alias bus.__removeListener__*
 
 Unbind one or many event handlers. Returns nothing. With no parameters, unbinds all the event handlers for all the event strings.
 
     >> bus.off()
 
-Takes in a route an array of routes returned by an `on` or `once`.
+Takes in a route returned by an `on` or `once`.
 
     >> var route = bus.on('out-of-fuel', function () {
          console.log('Hitchhike.')
@@ -184,7 +252,6 @@ The development of Minibus started in 2013-02-15 after hassling with [EventBus](
 ## See also
 
 - [Roadmap](doc/roadmap.md)
-- [Background theory](doc/theory.md)
 - [About testing](doc/testing.md)
 
 
