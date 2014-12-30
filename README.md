@@ -8,7 +8,7 @@ Using an event bus simplifies the structure of your code by letting the code com
 
 
 
-## Basic example
+## Usage
 
     > var bus = Minibus.create()
     > var route = bus.on('out-of-fuel', function () {
@@ -52,72 +52,6 @@ Using an event bus simplifies the structure of your code by letting the code com
 ### AMD & Require.js
 
     define(['scripts/minibus'], function (Minibus) { ... });
-
-
-
-## Simplifying the structure of your code
-
-Let's take an example how an event bus could help you to simplify your code and make it more extendable. Let's say you have this little chat application having view and main modules. Main is responsible of loading messages from the server and the job of view is to displays them.
-
-    // view.js
-    var View = function () {
-      this.appendMessage = function (message) {
-        $('ul#messages').append('<li>' + message + '</li>');
-      };
-    };
-
-    // main.js
-    var view = new View();
-    loadMessageAndThen(function success(message) {
-      view.appendMessage(message);
-    });
-
-A couple of years pass and the application needs a new feature: it should play a sound when a new message is loaded. A function `playSound` is given to you premade. The question is how to integrate it into the old code?
-
-You could play dirty and put `playSound` call into `appendMessage` before adding `<li>` element. Okay, it might work at first but you or your co-worker will hate former you when `appendMessage` needs to be modified next year.
-
-You could add `playSound` directly into `success` callback after the `appendMessage` call. Okay, it's somewhat better but still this, and the previous approach as well, requires you to modify the old code. As you probably know, modified old code is a great source of strange errors, especially when done after a couple of years.
-
-So none of the approaches were optimal. How to have the new functionality without putting it close to an unrelated piece of code or stabbing and probably breaking the old code?
-
-Let's go back in time and implement the original code with an event bus:
-
-    // view.js
-    var initView = function (bus) {
-      bus.on('newMessage', function appendMessage(message) {
-        $('ul#messages').append('<li>' + message + '</li>');
-      });
-    };
-
-    // main.js
-    var bus = Minibus.create();
-    initView(bus);
-    loadMessageAndThen(function success(message) {
-      bus.emit('newMessage', message);
-    });
-
-Nothing much changed or did it? Now the view listens to `newMessage` events and main emits those. One important change is that `success` would work even if view did not exist and therefore view and main are now called loosely coupled instead of tightly coupled.
-
-Let a couple of years pass and `playSound` function to be included. Due to our event bus we can now do it without the downsides. All we need is to add an additional handler for the `newMessage` event:
-
-    // view.js
-    var initView = function (bus) {
-      bus.on('newMessage', function appendMessage(message) {
-        $('ul#messages').append('<li>' + message + '</li>');
-      });
-      bus.on('newMessage', function () {
-        playSound();
-      });
-    };
-
-    // main.js
-    var bus = Minibus.create();
-    initView(bus);
-    loadMessageAndThen(function success(message) {
-      bus.emit('newMessage', message);
-    });
-
-Nice and simple, huh? No need to mix the new functionality with irrelevant code or modify the old. All we need is to share the event bus with the parts of the program emitting to or listening it.
 
 
 
